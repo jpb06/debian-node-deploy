@@ -1,0 +1,57 @@
+{
+   "required": [
+      "host",
+      "port",
+      "user",
+      "sshKey",
+      "filesRestoryPath",
+      "deployPath",
+      "appStopCommands",
+      "appStartCommands"
+   ],
+   "properties": {
+      "envFile": {
+         "$id": "#/properties/envFilePath",
+         "type": "string"
+      },
+      "host": {
+         "$id": "#/properties/host",
+         "type": "string",
+         "minLength": 1
+      },
+      "port": {
+         "$id": "#/properties/port",
+         "type": "integer"
+      },
+      "user": {
+         "$id": "#/properties/user",
+         "type": "string",
+         "minLength": 1
+      },
+      "sshKey": {
+         "$id": "#/properties/sshKey",
+         "type": "string",
+         "minLength": 1
+      },
+      "filesRestoryPath": {
+         "$id": "#/properties/filesRestoryPath",
+         "type": "string",
+         "minLength": 1
+      },
+      "deployPath": {
+         "$id": "#/properties/deployPath",
+         "type": "string",
+         "minLength": 1
+      },
+      "appStopCommands": {
+         "$id": "#/properties/appStopCommands",
+         "type": "array"
+      },
+      "appStartCommands": {
+         "$id": "#/properties/appStartCommands",
+         "type": "array"
+      }
+   },
+   "type": "object",
+   "$schema": "http://json-schema.org/draft-07/schema#"
+}
