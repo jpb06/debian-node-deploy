@@ -1,0 +1,40 @@
+{
+  "name": "debian-node-deploy",
+  "version": "1.0.0",
+  "description": "Unifying deployment tasks for my production server",
+  "main": "src/index.js",
+  "scripts": {
+    "prebuild": "rimraf dist-deploy && tsc",
+    "build": "node ./dist-deploy/src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpb06/debian-node-deploy.git"
+  },
+  "author": "jpb06",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jpb06/debian-node-deploy/issues"
+  },
+  "homepage": "https://github.com/jpb06/debian-node-deploy#readme",
+  "dependencies": {
+    "ajv": "^6.12.2",
+    "archiver": "^4.0.1",
+    "chalk": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "fs-extra": "^9.0.0",
+    "node-ssh": "^10.0.2",
+    "ora": "^4.0.4"
+  },
+  "devDependencies": {
+    "@types/ajv": "^1.0.0",
+    "@types/archiver": "^3.1.0",
+    "@types/chalk": "^2.2.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/fs-extra": "^9.0.1",
+    "@types/node-ssh": "^7.0.0",
+    "@types/ora": "^3.2.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.9.3"
+  }
+}
