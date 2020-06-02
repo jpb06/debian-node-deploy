@@ -1,26 +1,31 @@
 import { Console } from "../util/console.util";
-import { loadDeployConfig } from "../config/loader";
 import { setEnv } from "../tasks/env.tasks";
-import { generatePackage } from "../tasks/package.file.task";
-import { zip, unzipOnRemote } from "../tasks/zipping.task";
-import pckg from "../../package.json";
-import {
-  sendFileToDeployServer,
-  execAppStop,
-  execAppStart,
-  execNpmInstall,
-  execCommands,
-} from "../tasks/server.tasks";
+import { generatePackage } from "../tasks/config/package.file.task";
+import { zip } from "../tasks/zipping.task";
 import { resetErrorLogs } from "../util/logging.util";
 import { DeployStep } from "../types/deploy.step";
+import { loadPackageFile } from "../tasks/config/load.package.file.task";
+import { loadDeployConfig } from "../tasks/config/load.deploy.config.task";
+import { sendFileToDeployServer } from "../tasks/server/send.archive.task";
+import { execCommands } from "../tasks/server/execute.step.commands.task";
+import { execAppStop } from "../tasks/server/stop.app.task";
+import { unzipOnRemote } from "../tasks/server/remote.unzip.task";
+import { execNpmInstall } from "../tasks/server/install.app.task";
+import { execAppStart } from "../tasks/server/start.app.task";
 
 export const deploy = async (): Promise<void> => {
   await resetErrorLogs();
-  const config = await loadDeployConfig(pckg.name);
-  const archiveFileName = `${config.appName}_${pckg.version}.zip`;
-  Console.Initialize(`Deploying ${config.appName}`);
-
+  Console.Initialize();
   try {
+    Console.NewSection("Checking deploy configuration");
+
+    const packageFile = await loadPackageFile();
+    const config = await loadDeployConfig(packageFile.name);
+
+    Console.NewSection("Moving codebase");
+
+    const archiveFileName = `${config.appName}_${packageFile.version}.zip`;
+
     await setEnv(config.envFile);
     await generatePackage();
     await zip("./dist", `./release/${archiveFileName}`);
@@ -31,17 +36,20 @@ export const deploy = async (): Promise<void> => {
       `${config.filesRestoryPath}/${config.appName}`
     );
 
-    // Stopping the app
+    Console.NewSection(`Deploying ${config.appName}`);
+
+    // Stopping the previous version app
     await execCommands(config, DeployStep.PreStop);
     await execAppStop(config);
     await execCommands(config, DeployStep.PostStop);
 
+    // setting up
     await unzipOnRemote(config, archiveFileName);
     await execNpmInstall(config);
 
     // Starting the app
     await execCommands(config, DeployStep.PreStart);
-    await execAppStart(config, pckg.main);
+    await execAppStart(config, packageFile.main);
     await execCommands(config, DeployStep.PostStart);
 
     Console.End(true);
