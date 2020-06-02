@@ -9,8 +9,10 @@ import {
   execAppStop,
   execAppStart,
   execNpmInstall,
+  execCommands,
 } from "../tasks/server.tasks";
 import { resetErrorLogs } from "../util/logging.util";
+import { DeployStep } from "../types/deploy.step";
 
 export const deploy = async (): Promise<void> => {
   await resetErrorLogs();
@@ -19,16 +21,10 @@ export const deploy = async (): Promise<void> => {
   Console.Initialize(`Deploying ${config.appName}`);
 
   try {
-    // Env
     await setEnv(config.envFile);
-
-    // Package.json
     await generatePackage();
-
-    // Zipping
     await zip("./dist", `./release/${archiveFileName}`);
 
-    // Sending to deploy server
     await sendFileToDeployServer(
       config,
       archiveFileName,
@@ -36,14 +32,18 @@ export const deploy = async (): Promise<void> => {
     );
 
     // Stopping the app
+    await execCommands(config, DeployStep.PreStop);
     await execAppStop(config);
+    await execCommands(config, DeployStep.PostStop);
 
-    // Unzipping
     await unzipOnRemote(config, archiveFileName);
-
-    // deploying
     await execNpmInstall(config);
+
+    // Starting the app
+    await execCommands(config, DeployStep.PreStart);
     await execAppStart(config, pckg.main);
+    await execCommands(config, DeployStep.PostStart);
+
     Console.End(true);
     process.exit(0);
   } catch (err) {
