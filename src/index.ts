@@ -1,3 +1,3 @@
-import { deploy } from "./deploy/deploy.scenario";
+import { deployNodeApp } from "./scenarios/deploy.node.app.scenario";
 
-export default deploy;
+export default deployNodeApp;

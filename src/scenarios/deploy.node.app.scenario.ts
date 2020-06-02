@@ -13,7 +13,7 @@ import { unzipOnRemote } from "../tasks/server/remote.unzip.task";
 import { execNpmInstall } from "../tasks/server/install.app.task";
 import { execAppStart } from "../tasks/server/start.app.task";
 
-export const deploy = async (): Promise<void> => {
+export const deployNodeApp = async (): Promise<void> => {
   await resetErrorLogs();
   Console.Initialize();
   try {
