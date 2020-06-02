@@ -12,14 +12,12 @@ export abstract class Console {
   private static taskBarColor = "orange";
   private static currentTask: ora.Ora | null = null;
 
-  public static Initialize(
-    text: string,
-    barColor?: string,
-    taskBarColor?: string
-  ) {
+  public static Initialize(barColor?: string, taskBarColor?: string) {
     if (barColor) this.barColor = barColor;
     if (taskBarColor) this.taskBarColor = taskBarColor;
+  }
 
+  public static NewSection(text: string) {
     console.info(chalk.bgKeyword(this.barColor)(" "));
     console.info(
       chalk.bgKeyword(this.barColor)(" ") +
