@@ -12,9 +12,16 @@ export const execAppStart = async (
   try {
     const connection = await connect(config);
 
-    await connection.execCommand(`pm2 start ${main} --name ${config.appName}`, {
-      cwd: `${config.deployPath}/${config.appName}`,
-    });
+    const result = await connection.execCommand(
+      `pm2 start ${main} --name ${config.appName}`,
+      {
+        cwd: `${config.deployPath}/${config.appName}`,
+      }
+    );
+    if (result.stderr) {
+      await logError(result.stderr);
+      throw "An error occured while launching the app";
+    }
 
     connection.dispose();
     Console.Success("App launched");
