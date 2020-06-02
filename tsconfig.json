@@ -11,7 +11,9 @@
     "removeComments": true,
     "isolatedModules": false,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationDir": "./dist-deploy/typings"
   },
   "compileOnSave": false,
   "buildOnSave": false,
