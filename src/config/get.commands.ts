@@ -1,15 +1,45 @@
 import { DeployConfig } from "../types/deploy.config";
-import { AppCommands } from "../types/app.commands";
+import { DeployStep } from "../types/deploy.step";
 
-export const getCommandsFor = (config: DeployConfig, type: AppCommands) => {
-  let commands: Array<string>;
-  switch (type) {
-    case AppCommands.Start:
-      commands = config.appStartCommands;
-      break;
-    case AppCommands.Stop:
-      commands = config.appStopCommands;
-      break;
+interface CommandsContext {
+  commands: Array<string>;
+  startText: string;
+  errorText: string;
+  successTest: string;
+}
+
+export const getCommandsFor = (
+  config: DeployConfig,
+  step: DeployStep
+): CommandsContext => {
+  switch (step) {
+    case DeployStep.PreStart:
+      return {
+        commands: config.appPreStartCommands,
+        startText: "Executing pre start commands",
+        errorText: "Pre start commands execution failure",
+        successTest: "Pre start commands execution failure",
+      };
+    case DeployStep.PostStart:
+      return {
+        commands: config.appPostStartCommands,
+        startText: "Executing post start commands",
+        errorText: "Post start commands execution failure",
+        successTest: "Post start commands execution failure",
+      };
+    case DeployStep.PreStop:
+      return {
+        commands: config.appPreStopCommands,
+        startText: "Executing pre stop commands",
+        errorText: "Pre stop commands execution failure",
+        successTest: "Pre stop commands execution failure",
+      };
+    case DeployStep.PostStop:
+      return {
+        commands: config.appPostStopCommands,
+        startText: "Executing post stop commands",
+        errorText: "Post stop commands execution failure",
+        successTest: "Post stop commands execution failure",
+      };
   }
-  return commands;
 };
