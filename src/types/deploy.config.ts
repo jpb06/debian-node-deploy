@@ -7,6 +7,8 @@ export interface DeployConfig {
   sshKey: string;
   filesRestoryPath: string;
   deployPath: string;
-  appStopCommands: Array<string>;
-  appStartCommands: Array<string>;
+  appPreStopCommands: Array<string>;
+  appPostStopCommands: Array<string>;
+  appPreStartCommands: Array<string>;
+  appPostStartCommands: Array<string>;
 }

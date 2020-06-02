@@ -1,5 +1,5 @@
 import { DeployConfig } from "../types/deploy.config";
-import { AppCommands } from "../types/app.commands";
+import { DeployStep } from "../types/deploy.step";
 import { getCommandsFor } from "../config/get.commands";
 import { Console } from "./../util/console.util";
 import { logError } from "../util/logging.util";
@@ -86,22 +86,25 @@ export const execAppStart = async (
 
 export const execCommands = async (
   config: DeployConfig,
-  type: AppCommands
+  step: DeployStep
 ): Promise<void> => {
-  const commands = getCommandsFor(config, type);
-  if (commands.length === 0) return;
+  const context = getCommandsFor(config, step);
+  if (context.commands.length === 0) return;
+
+  Console.StartTask(context.startText);
 
   try {
     const connection = await connect(config);
 
-    for (const command in commands) {
+    for (const command in context.commands) {
       const result = await connection.execCommand(command);
       await logError(result.stderr);
     }
 
+    Console.Success(context.successTest);
     connection.dispose();
   } catch (err) {
     await logError(err);
-    throw err;
+    throw context.errorText;
   }
 };

@@ -6,8 +6,10 @@
       "sshKey",
       "filesRestoryPath",
       "deployPath",
-      "appStopCommands",
-      "appStartCommands"
+      "appPreStopCommands",
+      "appPostStopCommands",
+      "appPreStartCommands",
+      "appPostStartCommands"
    ],
    "properties": {
       "envFile": {
@@ -43,12 +45,20 @@
          "type": "string",
          "minLength": 1
       },
-      "appStopCommands": {
-         "$id": "#/properties/appStopCommands",
+      "appPreStopCommands": {
+         "$id": "#/properties/appPreStopCommands",
          "type": "array"
       },
-      "appStartCommands": {
-         "$id": "#/properties/appStartCommands",
+      "appPostStopCommands": {
+         "$id": "#/properties/appPostStopCommands",
+         "type": "array"
+      },
+      "appPreStartCommands": {
+         "$id": "#/properties/appPreStartCommands",
+         "type": "array"
+      },
+      "appPostStartCommands": {
+         "$id": "#/properties/appPostStartCommands",
          "type": "array"
       }
    },
