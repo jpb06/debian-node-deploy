@@ -56,7 +56,7 @@ Here is an example to add a deploy task to the scripts section of package.json.
 ### js
 
 ```js
-import { deployNodeApp } from "debian-node-deploy";
+import deployNodeApp from "debian-node-deploy";
 
 (async () => {
   await deployNodeApp();
