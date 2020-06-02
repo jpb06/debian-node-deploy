@@ -2,7 +2,7 @@
 
 ![Deploying via vscode terminal](./project-utils/readme/deploy2.png)
 
-Here is a little module I made to simplify my deploy needs.
+Here is a little module I made to simplify my deployments needs.
 
 ## How to use
 
