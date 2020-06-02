@@ -54,9 +54,9 @@ export const unzipOnRemote = async (
       `chown -R ${config.user} ${deployPath}`
     );
 
-    if (cleanResult.stderr) logError(cleanResult.stderr);
-    if (unzipOutput.stderr) logError(unzipOutput.stderr);
-    if (chownOutput.stderr) logError(chownOutput.stderr);
+    logError(cleanResult.stderr);
+    logError(unzipOutput.stderr);
+    logError(chownOutput.stderr);
 
     connection.dispose();
     Console.Success("Archive unzipped on deploy server");

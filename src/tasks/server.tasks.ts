@@ -36,7 +36,7 @@ export const execAppStop = async (config: DeployConfig): Promise<void> => {
     const connection = await connect(config);
 
     const result = await connection.execCommand(`pm2 delete ${config.appName}`);
-    if (result.stderr) await logError(result.stderr);
+    await logError(result.stderr);
     connection.dispose();
     Console.Success("Production app stopped");
   } catch (err) {
@@ -96,7 +96,7 @@ export const execCommands = async (
 
     for (const command in commands) {
       const result = await connection.execCommand(command);
-      if (result.stderr) await logError(result.stderr);
+      await logError(result.stderr);
     }
 
     connection.dispose();
