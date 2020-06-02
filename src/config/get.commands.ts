@@ -9,8 +9,8 @@ interface CommandsContext {
 }
 
 export const getCommandsFor = (
-  config: DeployConfig,
-  step: DeployStep
+  step: DeployStep,
+  config: DeployConfig
 ): CommandsContext => {
   switch (step) {
     case DeployStep.PreStart:
