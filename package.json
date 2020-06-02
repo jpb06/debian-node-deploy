@@ -1,11 +1,14 @@
 {
   "name": "debian-node-deploy",
-  "version": "1.0.0",
+  "version": "1.0.7",
   "description": "Unifying deployment tasks for my production server",
-  "main": "src/index.js",
+  "main": "index.js",
+  "bin": {
+    "deployNodeApp": "./cli/deploy.node.app.js"
+  },
   "scripts": {
-    "prebuild": "rimraf dist-deploy && tsc",
-    "build": "node ./dist-deploy/src/index.js"
+    "build": "rimraf dist-deploy && tsc && node ./project-utils/scripts/copy.package.json.file.js",
+    "start": "npm run build && node ./dist-deploy/index.js"
   },
   "repository": {
     "type": "git",
