@@ -13,8 +13,8 @@ export abstract class Console {
   private static currentTask: ora.Ora | null = null;
 
   public static Initialize(barColor?: string, taskBarColor?: string) {
-    if (barColor) this.barColor = barColor;
-    if (taskBarColor) this.taskBarColor = taskBarColor;
+    this.barColor = barColor || "white";
+    this.taskBarColor = taskBarColor || "orange";
   }
 
   public static NewSection(text: string) {
@@ -45,6 +45,7 @@ export abstract class Console {
           break;
         case TaskResult.Failure:
           this.currentTask.fail(chalk.red(message));
+          this.currentTask = null;
           this.End(false);
           break;
         case TaskResult.Info:
@@ -64,6 +65,7 @@ export abstract class Console {
     Console.EndTask(message, TaskResult.Info);
 
   public static End(succeeded: boolean) {
+    this.EndTask("Ending pending tasks ...", TaskResult.Info);
     console.info(chalk.bgKeyword(this.barColor)(" "));
     console.info(
       chalk.bgKeyword(this.barColor)(" ") +
