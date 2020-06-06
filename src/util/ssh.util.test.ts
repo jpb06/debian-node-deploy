@@ -7,12 +7,7 @@ jest.mock("node-ssh", () => {
   });
 });
 
-import NodeSSH from "node-ssh";
 import { connect } from "./ssh.util";
-import { mocked } from "ts-jest/utils";
-import { createNoSubstitutionTemplateLiteral } from "typescript";
-
-const NodeSSHMock = mocked(NodeSSH);
 
 describe("SSH utils", () => {
   it("should connect", async () => {

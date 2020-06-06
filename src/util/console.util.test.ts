@@ -1,6 +1,7 @@
 import { Console } from "./console.util";
 import chalk from "chalk";
 import ora from "ora";
+import { mocked } from "ts-jest/utils";
 
 const succeedMock = jest.fn();
 const warnMock = jest.fn();
@@ -103,7 +104,7 @@ describe("Console utils", () => {
 
     expect(startMock).toHaveBeenCalledTimes(1);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls[0]).toHaveLength(1);
     expect(oraMock.calls[0][0]).toEqual({
       prefixText: chalk.bgKeyword(taskColor)(" "),
@@ -122,7 +123,7 @@ describe("Console utils", () => {
 
     expect(startMock).toHaveBeenCalledTimes(1);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls[0]).toHaveLength(1);
   });
 
@@ -137,7 +138,7 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(0);
     expect(failMock).toHaveBeenCalledTimes(0);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls[0]).toHaveLength(1);
   });
 
@@ -156,7 +157,7 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(0);
     expect(failMock).toHaveBeenCalledTimes(1);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls[0]).toHaveLength(1);
 
     expect(console.info).toHaveBeenCalledTimes(3);
@@ -182,7 +183,7 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(1);
     expect(failMock).toHaveBeenCalledTimes(0);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls[0]).toHaveLength(1);
   });
 
@@ -203,7 +204,7 @@ describe("Console utils", () => {
 
     Console.End(true);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls[0]).toHaveLength(1);
 
     expect(console.info).toBeCalled();
@@ -235,7 +236,7 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(0);
     expect(failMock).toHaveBeenCalledTimes(0);
 
-    const oraMock = (ora as any).mock;
+    const oraMock = mocked(ora).mock;
     expect(oraMock.calls).toHaveLength(0);
   });
 });
