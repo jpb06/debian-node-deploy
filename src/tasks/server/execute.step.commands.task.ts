@@ -14,18 +14,20 @@ export const execCommands = async (
 
   Console.StartTask(context.startText);
 
+  let connection = undefined;
   try {
-    const connection = await connect(config);
+    connection = await connect(config);
 
     for (const command in context.commands) {
       const result = await connection.execCommand(command);
-      await logError(result.stderr);
+      if (result.code !== 0) throw result.stderr;
     }
 
     Console.Success(context.successTest);
-    connection.dispose();
   } catch (err) {
     await logError(err);
     throw context.errorText;
+  } finally {
+    if (connection) connection.dispose();
   }
 };

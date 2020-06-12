@@ -9,8 +9,9 @@ export const execAppStart = async (
 ): Promise<void> => {
   Console.StartTask("Launching the app ...");
 
+  let connection = undefined;
   try {
-    const connection = await connect(config);
+    connection = await connect(config);
 
     const result = await connection.execCommand(
       `pm2 start ${main} --name ${config.appName}`,
@@ -18,15 +19,13 @@ export const execAppStart = async (
         cwd: `${config.deployPath}/${config.appName}`,
       }
     );
-    if (result.stderr) {
-      await logError(result.stderr);
-      throw "An error occured while launching the app";
-    }
+    if (result.code !== 0) throw result.stderr;
 
-    connection.dispose();
     Console.Success("App launched");
   } catch (err) {
     await logError(err);
     throw "Failed to launch the app";
+  } finally {
+    if (connection) connection.dispose();
   }
 };
