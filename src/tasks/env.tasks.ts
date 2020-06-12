@@ -3,7 +3,7 @@ import { Console } from "./../util/console.util";
 import { logError } from "../util/logging.util";
 
 export const setEnv = async (envFile?: string): Promise<void> => {
-  if (envFile && envFile !== ".env") {
+  if (envFile && envFile.endsWith(".env")) {
     Console.StartTask("Setting up env");
 
     try {

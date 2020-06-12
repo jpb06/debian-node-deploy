@@ -5,7 +5,8 @@ import { logError } from "../../util/logging.util";
 export const generatePackage = async (): Promise<void> => {
   try {
     Console.StartTask("Generating bare package.json");
-    const data = JSON.parse(fs.readFileSync("./package.json").toString());
+    const buffer = await fs.readFile("./package.json");
+    const data = JSON.parse(buffer.toString());
 
     const barePackage = {
       name: data.name,
