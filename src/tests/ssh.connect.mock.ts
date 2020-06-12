@@ -34,7 +34,7 @@ export const mockSSHConnect = (
   }
 };
 
-export const mockSSHConnectForArchingSending = (
+export const mockSSHConnectForArchiveSending = (
   mkdirShouldThrow: boolean,
   putFileShouldThrow: boolean,
   connectionShouldThrow?: boolean
@@ -95,4 +95,23 @@ export const mockSSHConnectWithThreeCommands = (
       } as any;
     });
   }
+};
+
+export const mockSSHConnectForAppStop = () => {
+  execCommand.mockImplementationOnce(() => {
+    return {
+      code: 0,
+      stderr: undefined,
+      stdout: "",
+    };
+  });
+
+  mocked(connect).mockImplementation((config: DeployConfig) => {
+    return {
+      execCommand,
+      dispose,
+      mkdir,
+      putFile,
+    } as any;
+  });
 };

@@ -10,7 +10,7 @@ import {
   dispose,
   mkdir,
   putFile,
-  mockSSHConnectForArchingSending,
+  mockSSHConnectForArchiveSending,
 } from "./../../tests/ssh.connect.mock";
 import { config } from "../../tests/test.config";
 import { assignConsoleMocks } from "../../tests/console.mock";
@@ -24,7 +24,7 @@ describe("Send archive task", () => {
   });
 
   it("should throw if connection failed", async () => {
-    mockSSHConnectForArchingSending(true, false, true);
+    mockSSHConnectForArchiveSending(true, false, true);
 
     try {
       await sendFileToDeployServer(config, "source.zip", "/var/dest");
@@ -46,7 +46,7 @@ describe("Send archive task", () => {
   });
 
   it("should throw if mkdir failed", async () => {
-    mockSSHConnectForArchingSending(true, false);
+    mockSSHConnectForArchiveSending(true, false);
 
     try {
       await sendFileToDeployServer(config, "source.zip", "/var/dest");
@@ -68,7 +68,7 @@ describe("Send archive task", () => {
   });
 
   it("should throw if putFile failed", async () => {
-    mockSSHConnectForArchingSending(false, true);
+    mockSSHConnectForArchiveSending(false, true);
 
     try {
       await sendFileToDeployServer(config, "source.zip", "/var/dest");
@@ -90,7 +90,7 @@ describe("Send archive task", () => {
   });
 
   it("should complete gracefully if task succeeds", async () => {
-    mockSSHConnectForArchingSending(false, false);
+    mockSSHConnectForArchiveSending(false, false);
 
     expect(await sendFileToDeployServer(config, "source.zip", "/var/dest"))
       .resolves;
