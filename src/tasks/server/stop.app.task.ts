@@ -10,6 +10,16 @@ export const execAppStop = async (config: DeployConfig): Promise<void> => {
   try {
     connection = await connect(config);
 
+    const runningAppPid = await connection.execCommand(
+      `pm2 pid ${config.appName}`
+    );
+    if (runningAppPid.code !== 0) {
+      throw runningAppPid.stderr;
+    } else if (runningAppPid.code === 0 && runningAppPid.stdout === "") {
+      Console.Success("No app found in production");
+      return;
+    }
+
     const result = await connection.execCommand(`pm2 delete ${config.appName}`);
     if (result.code !== 0) throw result.stderr;
 
