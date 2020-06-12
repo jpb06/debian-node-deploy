@@ -10,8 +10,9 @@ export const sendFileToDeployServer = async (
 ): Promise<void> => {
   Console.StartTask("Sending the archive to deploy server");
 
+  let connection = undefined;
   try {
-    const connection = await connect(config);
+    connection = await connect(config);
 
     await connection.mkdir(destPath);
     await connection.putFile(
@@ -19,10 +20,11 @@ export const sendFileToDeployServer = async (
       `${destPath}/${sourceFileName}`
     );
 
-    connection.dispose();
     Console.Success("Archive uploaded to deploy server");
   } catch (err) {
     await logError(err);
     throw "Unable to send the archive";
+  } finally {
+    if (connection) connection.dispose();
   }
 };
