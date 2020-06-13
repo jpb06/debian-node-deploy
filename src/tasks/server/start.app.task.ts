@@ -1,7 +1,7 @@
 import { DeployConfig } from "../../types/deploy.config";
 import { Console } from "../../util/console.util";
 import { logError } from "../../util/logging.util";
-import { connect } from "../../util/ssh.util";
+import { connect, exec } from "../../util/ssh.util";
 
 export const execAppStart = async (
   config: DeployConfig,
@@ -13,13 +13,17 @@ export const execAppStart = async (
   try {
     connection = await connect(config);
 
-    const result = await connection.execCommand(
+    const result = await exec(
+      connection,
       `pm2 start ${main} --name ${config.appName}`,
       {
         cwd: `${config.deployPath}/${config.appName}`,
       }
     );
-    if (result.code !== 0) throw result.stderr;
+
+    if (result.code !== 0) {
+      throw result.err;
+    }
 
     Console.Success("App launched");
   } catch (err) {

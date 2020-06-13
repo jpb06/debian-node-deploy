@@ -1,7 +1,7 @@
 import { DeployConfig } from "../../types/deploy.config";
 import { Console } from "../../util/console.util";
 import { logError } from "../../util/logging.util";
-import { connect } from "../../util/ssh.util";
+import { connect, exec } from "../../util/ssh.util";
 
 export const unzipOnRemote = async (
   config: DeployConfig,
@@ -15,18 +15,20 @@ export const unzipOnRemote = async (
 
     const deployPath = `${config.deployPath}/${config.appName}`;
 
-    const cleanResult = await connection.execCommand(`rm -rf ${deployPath}`);
-    if (cleanResult.code !== 0) throw cleanResult.stderr;
+    const cleanResult = await exec(connection, `rm -rf ${deployPath}`);
+    if (cleanResult.code !== 0) throw cleanResult.err;
 
-    const unzipOutput = await connection.execCommand(
+    const unzipOutput = await exec(
+      connection,
       `unzip -qq ${config.filesRestoryPath}/${config.appName}/${fileName} -d ${deployPath}`
     );
-    if (unzipOutput.code !== 0) throw unzipOutput.stderr;
+    if (unzipOutput.code !== 0) throw unzipOutput.err;
 
-    const chownOutput = await connection.execCommand(
+    const chownOutput = await exec(
+      connection,
       `chown -R ${config.user} ${deployPath}`
     );
-    if (chownOutput.code !== 0) throw chownOutput.stderr;
+    if (chownOutput.code !== 0) throw chownOutput.err;
 
     Console.Success("Archive unzipped on deploy server");
   } catch (err) {
