@@ -13,3 +13,21 @@ export const connect = async (config: DeployConfig) => {
 
   return connection;
 };
+
+export const exec = async (
+  connection: NodeSSH,
+  command: string,
+  options?: any
+) => {
+  const result = await connection.execCommand(command, options);
+  if (!result.code) {
+    const code = await connection.execCommand("echo $?");
+    result.code = parseInt(code.stdout, 10);
+  }
+
+  return {
+    code: result.code,
+    err: result.stderr,
+    out: result.stdout,
+  };
+};

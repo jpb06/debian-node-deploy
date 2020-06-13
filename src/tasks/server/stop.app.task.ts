@@ -1,7 +1,7 @@
 import { DeployConfig } from "../../types/deploy.config";
 import { Console } from "../../util/console.util";
 import { logError } from "../../util/logging.util";
-import { connect } from "../../util/ssh.util";
+import { connect, exec } from "../../util/ssh.util";
 
 export const execAppStop = async (config: DeployConfig): Promise<void> => {
   Console.StartTask("Stopping the app in production ...");
@@ -10,18 +10,18 @@ export const execAppStop = async (config: DeployConfig): Promise<void> => {
   try {
     connection = await connect(config);
 
-    const runningAppPid = await connection.execCommand(
-      `pm2 pid ${config.appName}`
-    );
+    const runningAppPid = await exec(connection, `pm2 id ${config.appName}`);
     if (runningAppPid.code !== 0) {
-      throw runningAppPid.stderr;
-    } else if (runningAppPid.code === 0 && runningAppPid.stdout === "") {
+      throw runningAppPid.err;
+    } else if (runningAppPid.out === "[]") {
       Console.Success("No app found in production");
       return;
     }
 
-    const result = await connection.execCommand(`pm2 delete ${config.appName}`);
-    if (result.code !== 0) throw result.stderr;
+    const result = await exec(connection, `pm2 delete ${config.appName}`);
+    if (result.code !== 0) {
+      throw result.err;
+    }
 
     Console.Success("Production app stopped");
   } catch (err) {

@@ -5,7 +5,7 @@ import { copyFile, appendFile } from "fs-extra";
 import { Console } from "./../util/console.util";
 import { mocked } from "ts-jest/utils";
 import { setEnv } from "./env.tasks";
-import { assignConsoleMocks } from "../tests/console.mock";
+import { assignConsoleMocks } from "../tests/mocking/console.mock";
 
 const copyFileMock = mocked(copyFile);
 const appendFileMock = mocked(appendFile);

@@ -1,7 +1,7 @@
 import { DeployConfig } from "../../types/deploy.config";
 import { Console } from "../../util/console.util";
 import { logError } from "../../util/logging.util";
-import { connect } from "../../util/ssh.util";
+import { connect, exec } from "../../util/ssh.util";
 import { DeployStep } from "../../types/deploy.step";
 import { getCommandsFor } from "../../config/get.commands";
 
@@ -19,8 +19,8 @@ export const execCommands = async (
     connection = await connect(config);
 
     for (const command in context.commands) {
-      const result = await connection.execCommand(command);
-      if (result.code !== 0) throw result.stderr;
+      const result = await exec(connection, command);
+      if (result.code !== 0) throw result.err;
     }
 
     Console.Success(context.successTest);

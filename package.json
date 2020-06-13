@@ -1,6 +1,6 @@
 {
   "name": "debian-node-deploy",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Unifying deployment tasks for my production server",
   "main": "index.js",
   "bin": {
@@ -9,7 +9,8 @@
   "scripts": {
     "test": "jest --watchAll src --coverage",
     "build": "rimraf dist-deploy && tsc --project tsconfig-publish.json && node ./project-utils/scripts/copy.package.json.file.js",
-    "start": "npm run build && node ./dist-deploy/index.js"
+    "start": "npm run build && node ./dist-deploy/index.js",
+    "npmpublish": "npm run build && cd dist-deploy && npm publish"
   },
   "repository": {
     "type": "git",

@@ -5,16 +5,13 @@ jest.mock("../../util/logging.util");
 import { Console } from "./../../util/console.util";
 import { execCommands } from "./execute.step.commands.task";
 import { DeployStep } from "../../types/deploy.step";
-import { connect } from "../../util/ssh.util";
+import { connect, exec } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
 import { logError } from "../../util/logging.util";
-import {
-  execCommand,
-  dispose,
-  mockSSHConnect,
-} from "./../../tests/ssh.connect.mock";
 import { config } from "../../tests/test.config";
-import { assignConsoleMocks } from "../../tests/console.mock";
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
+import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
 
 assignConsoleMocks();
 
@@ -24,7 +21,8 @@ describe("Execute step commands tasks", () => {
   });
 
   it("shouldn't do anything if there is no command to execute", () => {
-    mockSSHConnect();
+    mockSSHConnect(false);
+
     expect(execCommands(config, DeployStep.PreStart)).resolves;
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(0);
@@ -34,7 +32,7 @@ describe("Execute step commands tasks", () => {
   });
 
   it("should fail if connection failed", async () => {
-    mockSSHConnect(undefined, "Error!", true);
+    mockSSHConnect(true);
 
     try {
       await execCommands(
@@ -56,7 +54,8 @@ describe("Execute step commands tasks", () => {
   });
 
   it("should fail if one command failed", async () => {
-    mockSSHConnect(undefined, "Error!");
+    mockSSHConnect(false);
+    mockSSHExec(false, "", "err");
 
     try {
       await execCommands(
@@ -78,7 +77,9 @@ describe("Execute step commands tasks", () => {
   });
 
   it("should succeed if all commands pass", async () => {
-    mockSSHConnect("Succeeded");
+    mockSSHConnect(false);
+    mockSSHExec(false);
+    mockSSHExec(false);
 
     expect(
       await execCommands(
@@ -98,7 +99,7 @@ describe("Execute step commands tasks", () => {
       "Post start commands execution success"
     );
 
-    expect(mocked(execCommand)).toHaveBeenCalledTimes(2);
+    expect(mocked(exec)).toHaveBeenCalledTimes(2);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 });

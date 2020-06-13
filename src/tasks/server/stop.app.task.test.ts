@@ -3,19 +3,14 @@ jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
 import { Console } from "./../../util/console.util";
-import { connect } from "../../util/ssh.util";
+import { exec, connect } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
 import { logError } from "../../util/logging.util";
-import {
-  execCommand,
-  dispose,
-  mockSSHConnect,
-  mockSSHConnectWithThreeCommands,
-  mockSSHConnectForAppStop,
-} from "./../../tests/ssh.connect.mock";
 import { config } from "../../tests/test.config";
-import { assignConsoleMocks } from "../../tests/console.mock";
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
 import { execAppStop } from "./stop.app.task";
+import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
+import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
 
 assignConsoleMocks();
 
@@ -25,7 +20,7 @@ describe("Stop app task", () => {
   });
 
   it("should throw an error if connection failed", async () => {
-    mockSSHConnect(undefined, "Error!", true);
+    mockSSHConnect(true);
 
     try {
       await execAppStop(config);
@@ -40,12 +35,13 @@ describe("Stop app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(execCommand)).toBeCalledTimes(0);
+    expect(mocked(exec)).toBeCalledTimes(0);
     expect(mocked(dispose)).toBeCalledTimes(0);
   });
 
   it("should throw an error if app launched check fails", async () => {
-    mockSSHConnectWithThreeCommands(undefined, "Error!", 1, false);
+    mockSSHConnect(false);
+    mockSSHExec(true);
 
     try {
       await execAppStop(config);
@@ -60,12 +56,13 @@ describe("Stop app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(execCommand)).toBeCalledTimes(1);
+    expect(mocked(exec)).toBeCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
   it("should complete gracefully if there is no app to stop", async () => {
-    mockSSHConnectForAppStop();
+    mockSSHConnect(false);
+    mockSSHExec(false, "[]");
 
     try {
       await execAppStop(config);
@@ -84,12 +81,14 @@ describe("Stop app task", () => {
     );
 
     expect(mocked(logError)).toHaveBeenCalledTimes(0);
-    expect(mocked(execCommand)).toBeCalledTimes(1);
+    expect(mocked(exec)).toBeCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
   it("should throw an error if app stop fails", async () => {
-    mockSSHConnectWithThreeCommands(undefined, "Error!", 2, false);
+    mockSSHConnect(false);
+    mockSSHExec(false, "[15]");
+    mockSSHExec(true);
 
     try {
       await execAppStop(config);
@@ -104,12 +103,14 @@ describe("Stop app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(execCommand)).toBeCalledTimes(2);
+    expect(mocked(exec)).toBeCalledTimes(2);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
   it("should complete gracefully if task succeeds", async () => {
-    mockSSHConnect("Success");
+    mockSSHConnect(false);
+    mockSSHExec(false, "[15]");
+    mockSSHExec(false);
 
     expect(await execAppStop(config)).resolves;
 
@@ -124,7 +125,7 @@ describe("Stop app task", () => {
       "Production app stopped"
     );
 
-    expect(mocked(execCommand)).toHaveBeenCalledTimes(2);
+    expect(mocked(exec)).toHaveBeenCalledTimes(2);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 });
