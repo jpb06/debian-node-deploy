@@ -5,7 +5,7 @@ jest.mock("fs-extra");
 import { Console } from "./../../util/console.util";
 import { mocked } from "ts-jest/utils";
 import { loadPackageFile } from "./load.package.file.task";
-import { assignConsoleMocks } from "../../tests/console.mock";
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
 import { logError } from "../../util/logging.util";
 import { pathExists, readJSON } from "fs-extra";
 

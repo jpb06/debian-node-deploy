@@ -6,15 +6,15 @@ import { Console } from "./../../util/console.util";
 import { connect } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
 import { logError } from "../../util/logging.util";
+import { config } from "../../tests/test.config";
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { sendFileToDeployServer } from "./send.archive.task";
 import {
-  dispose,
+  mockSSHConnect,
   mkdir,
   putFile,
-  mockSSHConnectForArchiveSending,
-} from "./../../tests/ssh.connect.mock";
-import { config } from "../../tests/test.config";
-import { assignConsoleMocks } from "../../tests/console.mock";
-import { sendFileToDeployServer } from "./send.archive.task";
+  dispose,
+} from "../../tests/mocking/ssh.connect.mock";
 
 assignConsoleMocks();
 
@@ -24,7 +24,7 @@ describe("Send archive task", () => {
   });
 
   it("should throw if connection failed", async () => {
-    mockSSHConnectForArchiveSending(true, false, true);
+    mockSSHConnect(true);
 
     try {
       await sendFileToDeployServer(config, "source.zip", "/var/dest");
@@ -46,7 +46,7 @@ describe("Send archive task", () => {
   });
 
   it("should throw if mkdir failed", async () => {
-    mockSSHConnectForArchiveSending(true, false);
+    mockSSHConnect(false, true);
 
     try {
       await sendFileToDeployServer(config, "source.zip", "/var/dest");
@@ -68,7 +68,7 @@ describe("Send archive task", () => {
   });
 
   it("should throw if putFile failed", async () => {
-    mockSSHConnectForArchiveSending(false, true);
+    mockSSHConnect(false, false, true);
 
     try {
       await sendFileToDeployServer(config, "source.zip", "/var/dest");
@@ -90,7 +90,7 @@ describe("Send archive task", () => {
   });
 
   it("should complete gracefully if task succeeds", async () => {
-    mockSSHConnectForArchiveSending(false, false);
+    mockSSHConnect(false, false, false);
 
     expect(await sendFileToDeployServer(config, "source.zip", "/var/dest"))
       .resolves;

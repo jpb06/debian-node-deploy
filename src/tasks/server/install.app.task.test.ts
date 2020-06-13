@@ -1,19 +1,16 @@
-jest.mock("../../util/ssh.util");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
+jest.mock("../../util/ssh.util");
 
 import { Console } from "./../../util/console.util";
-import { connect } from "../../util/ssh.util";
+import { connect, exec } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
 import { logError } from "../../util/logging.util";
 import { execNpmInstall } from "./install.app.task";
-import {
-  execCommand,
-  dispose,
-  mockSSHConnect,
-} from "./../../tests/ssh.connect.mock";
 import { config } from "../../tests/test.config";
-import { assignConsoleMocks } from "../../tests/console.mock";
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
+import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
 
 assignConsoleMocks();
 
@@ -23,7 +20,7 @@ describe("Install app task", () => {
   });
 
   it("should throw an error if connection failed", async () => {
-    mockSSHConnect(undefined, "Error!", true);
+    mockSSHConnect(true);
 
     try {
       await execNpmInstall(config);
@@ -42,7 +39,8 @@ describe("Install app task", () => {
   });
 
   it("should throw an error if the command failed", async () => {
-    mockSSHConnect(undefined, "Error!");
+    mockSSHConnect(false);
+    mockSSHExec(true);
 
     try {
       await execNpmInstall(config);
@@ -61,7 +59,8 @@ describe("Install app task", () => {
   });
 
   it("should complete gracefully if command succeeds", async () => {
-    mockSSHConnect("Success");
+    mockSSHConnect(false);
+    mockSSHExec(false, "stdout");
 
     expect(await execNpmInstall(config)).resolves;
 
@@ -76,7 +75,7 @@ describe("Install app task", () => {
       "Node modules installed"
     );
 
-    expect(mocked(execCommand)).toHaveBeenCalledTimes(1);
+    expect(mocked(exec)).toHaveBeenCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 });

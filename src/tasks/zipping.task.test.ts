@@ -6,7 +6,7 @@ import { Console } from "./../util/console.util";
 import { logError } from "../util/logging.util";
 import { zip } from "./zipping.task";
 import { PassThrough } from "stream";
-import { assignConsoleMocks } from "../tests/console.mock";
+import { assignConsoleMocks } from "../tests/mocking/console.mock";
 
 jest.mock("fs-extra");
 jest.mock("./../util/console.util");
