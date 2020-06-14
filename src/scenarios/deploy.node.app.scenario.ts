@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { Console } from "../util/console.util";
 import { setEnv } from "../tasks/env.tasks";
 import { generatePackage } from "../tasks/config/package.file.task";
