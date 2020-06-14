@@ -20,7 +20,7 @@ export const exec = async (
   options?: any
 ) => {
   const result = await connection.execCommand(command, options);
-  if (!result.code) {
+  if (result.code === null) {
     const code = await connection.execCommand("echo $?");
     result.code = parseInt(code.stdout, 10);
   }

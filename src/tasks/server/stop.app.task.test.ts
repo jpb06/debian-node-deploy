@@ -39,7 +39,7 @@ describe("Stop app task", () => {
     expect(mocked(dispose)).toBeCalledTimes(0);
   });
 
-  it("should throw an error if app launched check fails", async () => {
+  it("should throw an error if app launched check fails (exception)", async () => {
     mockSSHConnect(false);
     mockSSHExec(true);
 
@@ -56,6 +56,27 @@ describe("Stop app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
+    expect(mocked(exec)).toBeCalledTimes(1);
+    expect(mocked(dispose)).toBeCalledTimes(1);
+  });
+
+  it("should throw an error if app launched check fails (invalid error code)", async () => {
+    mockSSHConnect(false);
+    mockSSHExec(false, "", "Command 1 error");
+
+    try {
+      await execAppStop(config);
+    } catch (err) {
+      expect(err).toBe("Failed to stop the app in production");
+    }
+
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+      "Stopping the app in production ..."
+    );
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+    expect(mocked(logError)).toHaveBeenCalledWith("Command 1 error");
     expect(mocked(exec)).toBeCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
@@ -85,7 +106,7 @@ describe("Stop app task", () => {
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
-  it("should throw an error if app stop fails", async () => {
+  it("should throw an error if app stop fails (exception)", async () => {
     mockSSHConnect(false);
     mockSSHExec(false, "[15]");
     mockSSHExec(true);
@@ -103,6 +124,28 @@ describe("Stop app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
+    expect(mocked(exec)).toBeCalledTimes(2);
+    expect(mocked(dispose)).toBeCalledTimes(1);
+  });
+
+  it("should throw an error if app stop fails (invalid error code)", async () => {
+    mockSSHConnect(false);
+    mockSSHExec(false, "[15]");
+    mockSSHExec(false, "", "Command 2 error");
+
+    try {
+      await execAppStop(config);
+    } catch (err) {
+      expect(err).toBe("Failed to stop the app in production");
+    }
+
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+      "Stopping the app in production ..."
+    );
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+    expect(mocked(logError)).toHaveBeenCalledWith("Command 2 error");
     expect(mocked(exec)).toBeCalledTimes(2);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
