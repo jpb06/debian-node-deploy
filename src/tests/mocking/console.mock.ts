@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { Console } from "../../util/console.util";
 
 export const assignConsoleMocks = () => {

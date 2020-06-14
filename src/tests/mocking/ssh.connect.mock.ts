@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 jest.mock("../../util/ssh.util");
 
 import { connect } from "../../util/ssh.util";
