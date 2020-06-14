@@ -39,7 +39,7 @@ describe("Install app task", () => {
     expect(mocked(dispose)).toBeCalledTimes(0);
   });
 
-  it("should throw an error if the task failed", async () => {
+  it("should throw an error if the task failed (exception)", async () => {
     mockSSHConnect(false);
     mockSSHExec(true);
 
@@ -56,6 +56,27 @@ describe("Install app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
+    expect(mocked(exec)).toBeCalledTimes(1);
+    expect(mocked(dispose)).toBeCalledTimes(1);
+  });
+
+  it("should throw an error if the task failed (invalid error code)", async () => {
+    mockSSHConnect(false);
+    mockSSHExec(false, "", "command error");
+
+    try {
+      await execAppStart(config, "yolo");
+    } catch (err) {
+      expect(err).toBe("Failed to launch the app");
+    }
+
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+      "Launching the app ..."
+    );
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+    expect(mocked(logError)).toHaveBeenCalledWith("command error");
     expect(mocked(exec)).toBeCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });

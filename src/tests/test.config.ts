@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export const config = {
   appName: "test",
   host: "127.0.0.1",

@@ -38,7 +38,7 @@ describe("Install app task", () => {
     expect(mocked(dispose)).toBeCalledTimes(0);
   });
 
-  it("should throw an error if the command failed", async () => {
+  it("should throw an error if the command failed (exception)", async () => {
     mockSSHConnect(false);
     mockSSHExec(true);
 
@@ -55,6 +55,26 @@ describe("Install app task", () => {
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
+    expect(mocked(dispose)).toBeCalledTimes(1);
+  });
+
+  it("should throw an error if the command failed (invalid error code)", async () => {
+    mockSSHConnect(false);
+    mockSSHExec(false, "", "Command error");
+
+    try {
+      await execNpmInstall(config);
+    } catch (err) {
+      expect(err).toBe("Failed to install node modules");
+    }
+
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+      "Running npm install ..."
+    );
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+    expect(mocked(logError)).toHaveBeenCalledWith("Command error");
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
