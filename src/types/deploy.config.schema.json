@@ -30,6 +30,10 @@
          "type": "string",
          "minLength": 1
       },
+      "password": {
+         "$id": "#/properties/password",
+         "type": "string"
+      },
       "sshKey": {
          "$id": "#/properties/sshKey",
          "type": "string",
@@ -60,6 +64,10 @@
       "appPostStartCommands": {
          "$id": "#/properties/appPostStartCommands",
          "type": "array"
+      },
+      "websiteDomain": {
+         "$id": "#/properties/websiteDomain",
+         "type": "string"
       }
    },
    "type": "object",

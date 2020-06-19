@@ -4,6 +4,7 @@ export interface DeployConfig {
   host: string;
   port: number;
   user: string;
+  password?: string;
   sshKey: string;
   filesRestoryPath: string;
   deployPath: string;
@@ -11,4 +12,5 @@ export interface DeployConfig {
   appPostStopCommands: Array<string>;
   appPreStartCommands: Array<string>;
   appPostStartCommands: Array<string>;
+  websiteDomain?: string;
 }
