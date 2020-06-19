@@ -10,7 +10,8 @@
 
 # production
 **/build
-**/dist
+**/dist*
+nginx.config
 
 # misc
 .DS_Store
@@ -25,6 +26,6 @@ yarn-error.log*
 dist-deploy/
 release/
 deploy-errors.log
-deploy.config.json
+deploy.config*
 .env
 .env.dev
