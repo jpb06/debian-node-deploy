@@ -18,7 +18,7 @@ export const loadPackageFile = async (isSpa: boolean): Promise<any> => {
       const requiredProps = isSpa
         ? "name and version"
         : "name, version and main";
-      throw `${message} ${requiredProps} must be defined`;
+      throw `${message} ${requiredProps} must be defined.`;
     }
 
     Console.Success("package.json content extracted");
