@@ -5,14 +5,15 @@ import { connect } from "../../util/ssh.util";
 
 export const sendFileToDeployServer = async (
   config: DeployConfig,
-  sourceFileName: string,
-  destPath: string
+  sourceFileName: string
 ): Promise<void> => {
   Console.StartTask("Sending the archive to deploy server");
 
   let connection = undefined;
   try {
     connection = await connect(config);
+
+    const destPath = `${config.filesRestoryPath}/${config.appName}`;
 
     await connection.mkdir(destPath);
     await connection.putFile(
