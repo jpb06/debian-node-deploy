@@ -5,7 +5,8 @@ import { connect, exec } from "../../util/ssh.util";
 
 export const unzipOnRemote = async (
   config: DeployConfig,
-  fileName: string
+  fileName: string,
+  isSpa: boolean
 ): Promise<void> => {
   Console.StartTask("Unzipping files");
 
@@ -13,20 +14,31 @@ export const unzipOnRemote = async (
   try {
     connection = await connect(config);
 
-    const deployPath = `${config.deployPath}/${config.appName}`;
+    const deployPath = isSpa
+      ? `${config.deployPath}/${config.websiteDomain}/html`
+      : `${config.deployPath}/${config.appName}`;
+    const sudo = isSpa ? `echo ${config.password} | sudo -S ` : "";
 
-    const cleanResult = await exec(connection, `rm -rf ${deployPath}`);
+    if (isSpa) {
+      const mkdirResult = await exec(
+        connection,
+        `${sudo}mkdir -p ${deployPath}`
+      );
+      if (mkdirResult.code !== 0) throw mkdirResult.err;
+    }
+
+    const cleanResult = await exec(connection, `${sudo}rm -rf ${deployPath}`);
     if (cleanResult.code !== 0) throw cleanResult.err;
 
     const unzipOutput = await exec(
       connection,
-      `unzip -qq ${config.filesRestoryPath}/${config.appName}/${fileName} -d ${deployPath}`
+      `${sudo}unzip -qq ${config.filesRestoryPath}/${config.appName}/${fileName} -d ${deployPath}`
     );
     if (unzipOutput.code !== 0) throw unzipOutput.err;
 
     const chownOutput = await exec(
       connection,
-      `chown -R ${config.user} ${deployPath}`
+      `${sudo}chown -R ${config.user} ${deployPath}`
     );
     if (chownOutput.code !== 0) throw chownOutput.err;
 

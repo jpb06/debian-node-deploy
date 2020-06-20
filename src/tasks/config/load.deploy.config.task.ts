@@ -5,7 +5,6 @@ import { Console } from "../../util/console.util";
 import { logError } from "../../util/logging.util";
 import { pathExists } from "fs-extra";
 import { DeployConfig } from "../../types/deploy.config";
-import { mocked } from "ts-jest/utils";
 
 const validateConfig = async (data: any) => {
   const ajv = new Ajv();

@@ -9,10 +9,10 @@ import { loadPackageFile } from "../tasks/config/load.package.file.task";
 import { loadDeployConfig } from "../tasks/config/load.deploy.config.task";
 import { sendFileToDeployServer } from "../tasks/server/send.archive.task";
 import { execCommands } from "../tasks/server/execute.step.commands.task";
-import { execAppStop } from "../tasks/server/stop.app.task";
+import { execAppStop } from "../tasks/pm2/stop.app.task";
 import { unzipOnRemote } from "../tasks/server/remote.unzip.task";
-import { execNpmInstall } from "../tasks/server/install.app.task";
-import { execAppStart } from "../tasks/server/start.app.task";
+import { execNpmInstall } from "../tasks/npm/install.app.task";
+import { execAppStart } from "../tasks/pm2/start.app.task";
 
 export const deployNodeApp = async (): Promise<void> => {
   await resetErrorLogs();
@@ -20,7 +20,7 @@ export const deployNodeApp = async (): Promise<void> => {
   try {
     Console.NewSection("Checking deploy configuration");
 
-    const packageFile = await loadPackageFile();
+    const packageFile = await loadPackageFile(false);
     const config = await loadDeployConfig(packageFile.name);
 
     Console.NewSection("Moving codebase");
@@ -31,11 +31,7 @@ export const deployNodeApp = async (): Promise<void> => {
     await generatePackage();
     await zip("./dist", `./release/${archiveFileName}`);
 
-    await sendFileToDeployServer(
-      config,
-      archiveFileName,
-      `${config.filesRestoryPath}/${config.appName}`
-    );
+    await sendFileToDeployServer(config, archiveFileName);
 
     Console.NewSection(`Deploying ${config.appName}`);
 
@@ -45,7 +41,7 @@ export const deployNodeApp = async (): Promise<void> => {
     await execCommands(config, DeployStep.PostStop);
 
     // setting up
-    await unzipOnRemote(config, archiveFileName);
+    await unzipOnRemote(config, archiveFileName, false);
     await execNpmInstall(config);
 
     // Starting the app
