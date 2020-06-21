@@ -27,7 +27,7 @@ export const deployNodeApp = async (): Promise<void> => {
 
     const archiveFileName = `${config.appName}_${packageFile.version}.zip`;
 
-    await setEnv(config.envFile);
+    await setEnv("./dist", config.envFile);
     await generatePackage();
     await zip("./dist", `./release/${archiveFileName}`);
 
