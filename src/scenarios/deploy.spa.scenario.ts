@@ -26,8 +26,6 @@ export const deploySinglePageApplication = async (): Promise<void> => {
 
     Console.NewSection("Moving single page application files");
 
-    await setEnv(config.envFile);
-
     const archiveFileName = `${config.appName}_${packageFile.version}.zip`;
     await zip("./build", `./release/${archiveFileName}`);
 
