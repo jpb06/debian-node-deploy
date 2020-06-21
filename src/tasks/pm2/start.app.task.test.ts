@@ -1,20 +1,23 @@
+jest.mock("../../util/ssh.util");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
-jest.mock("../../util/ssh.util");
 
-import { Console } from "./../../util/console.util";
+import { Console } from "../../util/console.util";
 import { connect, exec } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
 import { logError } from "../../util/logging.util";
-import { execNpmInstall } from "./install.app.task";
 import { config } from "../../tests/test.config";
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { execAppStart } from "./start.app.task";
 import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
 import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
 
 assignConsoleMocks();
 
-describe("Install app task", () => {
+const consoleStart = "Launching the app ...";
+const exceptionMessage = "Failed to launch the app";
+
+describe("Start app task", () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
@@ -23,77 +26,70 @@ describe("Install app task", () => {
     mockSSHConnect(true);
 
     try {
-      await execNpmInstall(config);
+      await execAppStart(config, "yolo");
     } catch (err) {
-      expect(err).toBe("Failed to install node modules");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
+    expect(mocked(exec)).toBeCalledTimes(0);
     expect(mocked(dispose)).toBeCalledTimes(0);
   });
 
-  it("should throw an error if the command failed (exception)", async () => {
+  it("should throw an error if the task failed (exception)", async () => {
     mockSSHConnect(false);
     mockSSHExec(true);
 
     try {
-      await execNpmInstall(config);
+      await execAppStart(config, "yolo");
     } catch (err) {
-      expect(err).toBe("Failed to install node modules");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
+    expect(mocked(exec)).toBeCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
-  it("should throw an error if the command failed (invalid error code)", async () => {
+  it("should throw an error if the task failed (invalid error code)", async () => {
     mockSSHConnect(false);
-    mockSSHExec(false, "", "Command error");
+    mockSSHExec(false, "", "command error");
 
     try {
-      await execNpmInstall(config);
+      await execAppStart(config, "yolo");
     } catch (err) {
-      expect(err).toBe("Failed to install node modules");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith("Command error");
+    expect(mocked(logError)).toHaveBeenCalledWith("command error");
+    expect(mocked(exec)).toBeCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
-  it("should complete gracefully if command succeeds", async () => {
+  it("should complete gracefully if task succeeds", async () => {
     mockSSHConnect(false);
-    mockSSHExec(false, "stdout");
+    mockSSHExec(false, "[PM2] Done.");
 
-    expect(await execNpmInstall(config)).resolves;
+    expect(await execAppStart(config, "yolo")).resolves;
 
     expect(mocked(connect).mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "Node modules installed"
-    );
+    expect(mocked(Console.Success).mock.calls[0][0]).toEqual("App launched");
 
     expect(mocked(exec)).toHaveBeenCalledTimes(1);
     expect(mocked(dispose)).toBeCalledTimes(1);

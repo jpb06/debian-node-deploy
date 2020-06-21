@@ -2,7 +2,7 @@ jest.mock("../../util/ssh.util");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "./../../util/console.util";
+import { Console } from "../../util/console.util";
 import { exec, connect } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
 import { logError } from "../../util/logging.util";
@@ -13,6 +13,9 @@ import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
 import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
 
 assignConsoleMocks();
+
+const consoleStart = "Stopping the app in production ...";
+const exceptionMessage = "Failed to stop the app in production";
 
 describe("Stop app task", () => {
   afterEach(() => {
@@ -25,13 +28,11 @@ describe("Stop app task", () => {
     try {
       await execAppStop(config);
     } catch (err) {
-      expect(err).toBe("Failed to stop the app in production");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -46,13 +47,11 @@ describe("Stop app task", () => {
     try {
       await execAppStop(config);
     } catch (err) {
-      expect(err).toBe("Failed to stop the app in production");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -67,13 +66,11 @@ describe("Stop app task", () => {
     try {
       await execAppStop(config);
     } catch (err) {
-      expect(err).toBe("Failed to stop the app in production");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalledWith("Command 1 error");
@@ -88,13 +85,11 @@ describe("Stop app task", () => {
     try {
       await execAppStop(config);
     } catch (err) {
-      expect(err).toBe("Failed to stop the app in production");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
@@ -114,13 +109,11 @@ describe("Stop app task", () => {
     try {
       await execAppStop(config);
     } catch (err) {
-      expect(err).toBe("Failed to stop the app in production");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -136,13 +129,11 @@ describe("Stop app task", () => {
     try {
       await execAppStop(config);
     } catch (err) {
-      expect(err).toBe("Failed to stop the app in production");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalledWith("Command 2 error");
@@ -159,9 +150,7 @@ describe("Stop app task", () => {
 
     expect(mocked(connect).mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Stopping the app in production ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
