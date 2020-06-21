@@ -21,7 +21,7 @@ yarn add debian-node-deploy
 create the config file on your app root : `deploy.config.json`.
 Here is a sample file:
 
-```json
+```js
 {
   "envFile": ".env.production",
   "host": "my-production-server.org",
