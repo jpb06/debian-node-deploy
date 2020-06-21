@@ -19,19 +19,38 @@ yarn add debian-node-deploy
 ```
 
 create the config file on your app root : `deploy.config.json`.
-Here is a sample file:
 
-```js
+Here is a sample configuration for node apps:
+
+```json
 {
   "envFile": ".env.production",
   "host": "my-production-server.org",
   "port": 22,
   "user": "myusername",
-  "password": "my password", // Required only for spa deploy
   "sshKey": "/path/to/ssh/key",
   "filesRestoryPath": "/where/to/send/the/archive/containing/the/code/to/deploy",
   "deployPath": "/where/to/deploy/the/app/on/production/server",
-  "websiteDomain": "mywebsite.com", // Required only for spa deploy
+  "appPreStopCommands": [],
+  "appPostStopCommands": [],
+  "appPreStartCommands": [],
+  "appPostStartCommands": []
+}
+```
+
+For a single page applications, we need to specify two more properties:
+
+```json
+{
+  "envFile": ".env.production",
+  "host": "my-production-server.org",
+  "port": 22,
+  "user": "myusername",
+  "password": "my password",
+  "sshKey": "/path/to/ssh/key",
+  "filesRestoryPath": "/where/to/send/the/archive/containing/the/code/to/deploy",
+  "deployPath": "/where/to/deploy/the/app/on/production/server",
+  "websiteDomain": "mywebsite.com",
   "appPreStopCommands": [],
   "appPostStopCommands": [],
   "appPreStartCommands": [],
