@@ -27,9 +27,11 @@ Here is a sample file:
   "host": "my-production-server.org",
   "port": 22,
   "user": "myusername",
+  "password": "my password", // Required only for spa deploy
   "sshKey": "/path/to/ssh/key",
   "filesRestoryPath": "/where/to/send/the/archive/containing/the/code/to/deploy",
   "deployPath": "/where/to/deploy/the/app/on/production/server",
+  "websiteDomain": "mywebsite.com", // Required only for spa deploy
   "appPreStopCommands": [],
   "appPostStopCommands": [],
   "appPreStartCommands": [],
@@ -42,6 +44,10 @@ The last four properties allow you to specify commands to execute before/after s
 ### Usage
 
 You can trigger a deploy from cli or from code.
+There is two types of deployments available:
+
+- Node application
+- Single page application
 
 ### cli
 
@@ -49,7 +55,8 @@ Here is an example to add a deploy task to the scripts section of package.json.
 
 ```json
 "scripts": {
-   "deploy": "npm run build && deployNodeApp"
+   "deploynodeapp": "npm run build && deployNodeApp",
+   "deployspa": "npm run build && deploySinglePageApp"
 },
 ```
 
@@ -59,6 +66,7 @@ Here is an example to add a deploy task to the scripts section of package.json.
 import deployNodeApp from "debian-node-deploy";
 
 (async () => {
-  await deployNodeApp();
+  await deployNodeApp(); // To deploy a node app
+  await deployspa(); // or to deploy a spa
 })();
 ```
