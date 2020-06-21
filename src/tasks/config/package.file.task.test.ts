@@ -12,6 +12,8 @@ import * as fs from "fs";
 
 assignConsoleMocks();
 
+const consoleStart = "Generating bare package.json";
+
 describe("Package file task", () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -29,9 +31,7 @@ describe("Package file task", () => {
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Generating bare package.json"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalledWith(new Error("Read file error"));
@@ -45,9 +45,7 @@ describe("Package file task", () => {
     expect(await generatePackage()).resolves;
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Generating bare package.json"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(

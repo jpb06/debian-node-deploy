@@ -13,6 +13,10 @@ import Ajv from "ajv";
 
 assignConsoleMocks();
 
+const consoleStart = "Validating deploy config";
+const consoleSuccess = "Deploy config validated";
+const exceptionMessage = "deploy.config.json file is Missing";
+
 describe("Load deploy config task", () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -24,21 +28,19 @@ describe("Load deploy config task", () => {
     try {
       await loadDeployConfig("yolo");
     } catch (err) {
-      expect(err).toBe("deploy.config.json file is Missing");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Validating deploy config"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(
-      "deploy.config.json file is Missing"
-    );
+    expect(mocked(logError)).toHaveBeenCalledWith(exceptionMessage);
   });
 
   it("should throw an error if config is invalid", async () => {
+    const exceptionMessage = "Invalid deploy config";
+
     mocked(pathExists).mockImplementationOnce(() => true);
     mocked(Ajv).mockReturnValueOnce({
       ...new Ajv(),
@@ -59,13 +61,11 @@ describe("Load deploy config task", () => {
     try {
       await loadDeployConfig("yolo");
     } catch (err) {
-      expect(err).toBe("Invalid deploy config");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Validating deploy config"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenNthCalledWith(
@@ -76,10 +76,7 @@ describe("Load deploy config task", () => {
       2,
       'Errors:[{"keyword":"yo","dataPath":"hm","schemaPath":"arg","params":{"keyword":"yolo"}}]'
     );
-    expect(mocked(logError)).toHaveBeenNthCalledWith(
-      3,
-      "Invalid deploy config"
-    );
+    expect(mocked(logError)).toHaveBeenNthCalledWith(3, exceptionMessage);
   });
 
   it("should complete gracefully if task succeeds", async () => {
@@ -119,14 +116,10 @@ describe("Load deploy config task", () => {
     });
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Validating deploy config"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "Deploy config validated"
-    );
+    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
 
     expect(mocked(logError)).toHaveBeenCalledTimes(0);
   });
