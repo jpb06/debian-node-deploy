@@ -7,6 +7,7 @@ export const config = {
   sshKey: "key",
   filesRestoryPath: "/var/repository",
   deployPath: "/var/deploy",
+  websiteDomain: "testdomain.com",
   appPreStopCommands: [],
   appPostStopCommands: [],
   appPreStartCommands: [],
