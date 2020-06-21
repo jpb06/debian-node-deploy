@@ -2,19 +2,24 @@ jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 jest.mock("../../util/ssh.util");
 
-import { Console } from "./../../util/console.util";
-import { connect, exec } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
+import { Console } from "../../util/console.util";
+import { connect, exec } from "../../util/ssh.util";
 import { logError } from "../../util/logging.util";
-import { execNpmInstall } from "./install.app.task";
 import { config } from "../../tests/test.config";
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
 import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
 import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
+import { tlsCertificateExists } from "./check.tls.certificate.status.task";
 
 assignConsoleMocks();
 
-describe("Install app task", () => {
+const consoleStart = "Checking TLS certificate ...";
+const consoleSuccessCertificatefound = "TLS certificate found";
+const consoleSuccessCertificateNotFound = "No TLS certificate found";
+const exceptionMessage = "Failed to check TLS certificate";
+
+describe("Check TLS certificate status task", () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
@@ -23,15 +28,13 @@ describe("Install app task", () => {
     mockSSHConnect(true);
 
     try {
-      await execNpmInstall(config);
+      await tlsCertificateExists(config);
     } catch (err) {
-      expect(err).toBe("Failed to install node modules");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -43,15 +46,13 @@ describe("Install app task", () => {
     mockSSHExec(true);
 
     try {
-      await execNpmInstall(config);
+      await tlsCertificateExists(config);
     } catch (err) {
-      expect(err).toBe("Failed to install node modules");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -63,36 +64,53 @@ describe("Install app task", () => {
     mockSSHExec(false, "", "Command error");
 
     try {
-      await execNpmInstall(config);
+      await tlsCertificateExists(config);
     } catch (err) {
-      expect(err).toBe("Failed to install node modules");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalledWith("Command error");
     expect(mocked(dispose)).toBeCalledTimes(1);
   });
 
-  it("should complete gracefully if command succeeds", async () => {
+  it("should return false if no certificate could be found", async () => {
     mockSSHConnect(false);
-    mockSSHExec(false, "stdout");
+    mockSSHExec(false, "Certificate Name: Yolo");
 
-    expect(await execNpmInstall(config)).resolves;
+    const result = await tlsCertificateExists(config);
+    expect(result).toBe(false);
 
     expect(mocked(connect).mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Running npm install ..."
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "Node modules installed"
+      consoleSuccessCertificateNotFound
+    );
+
+    expect(mocked(exec)).toHaveBeenCalledTimes(1);
+    expect(mocked(dispose)).toBeCalledTimes(1);
+  });
+
+  it("should return true if a certificate could be found", async () => {
+    mockSSHConnect(false);
+    mockSSHExec(false, "Certificate Name: testdomain.com");
+
+    const result = await tlsCertificateExists(config);
+    expect(result).toBe(true);
+
+    expect(mocked(connect).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
+    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
+      consoleSuccessCertificatefound
     );
 
     expect(mocked(exec)).toHaveBeenCalledTimes(1);

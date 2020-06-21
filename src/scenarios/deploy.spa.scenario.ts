@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { resetErrorLogs } from "../util/logging.util";
 import { Console } from "../util/console.util";
 import { checkNginxConfig } from "../tasks/nginx/check.nginx.config.task";

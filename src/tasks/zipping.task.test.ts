@@ -28,6 +28,9 @@ const createWriteStreamMock = mocked(createWriteStream);
 const mockedArchiver = mocked(archiver);
 assignConsoleMocks();
 
+const consoleStart = "Zipping codebase";
+const exceptionMessage = "Failed to zip codebase";
+
 describe("Zipping tasks", () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -57,9 +60,7 @@ describe("Zipping tasks", () => {
     expect(mockedArchiver.mock.calls).toHaveLength(1);
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Zipping codebase"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
     expect(ensureDirMock.mock.calls).toHaveLength(1);
     expect(createWriteStreamMock.mock.calls).toHaveLength(1);
 
@@ -96,9 +97,7 @@ describe("Zipping tasks", () => {
       expect(mockedArchiver.mock.calls).toHaveLength(1);
 
       expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-        "Zipping codebase"
-      );
+      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
       expect(ensureDirMock.mock.calls).toHaveLength(1);
       expect(createWriteStreamMock.mock.calls).toHaveLength(1);
 
@@ -110,7 +109,7 @@ describe("Zipping tasks", () => {
       expect(archiveMock.finalize.mock.calls).toHaveLength(1);
 
       expect(mocked(logError).mock.calls).toHaveLength(1);
-      expect(err).toEqual("Failed to zip codebase");
+      expect(err).toEqual(exceptionMessage);
     }
   });
 
@@ -136,9 +135,7 @@ describe("Zipping tasks", () => {
       expect(mockedArchiver.mock.calls).toHaveLength(1);
 
       expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-        "Zipping codebase"
-      );
+      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
       expect(ensureDirMock.mock.calls).toHaveLength(1);
       expect(createWriteStreamMock.mock.calls).toHaveLength(1);
 
@@ -150,7 +147,7 @@ describe("Zipping tasks", () => {
       expect(archiveMock.finalize.mock.calls).toHaveLength(1);
 
       expect(mocked(logError).mock.calls).toHaveLength(1);
-      expect(err).toEqual("Failed to zip codebase");
+      expect(err).toEqual(exceptionMessage);
     }
   });
 });

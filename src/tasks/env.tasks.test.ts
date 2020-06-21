@@ -11,6 +11,8 @@ const copyFileMock = mocked(copyFile);
 const appendFileMock = mocked(appendFile);
 assignConsoleMocks();
 
+const consoleStart = "Setting up env";
+
 describe("Env tasks", () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -35,9 +37,7 @@ describe("Env tasks", () => {
 
     expect(copyFileMock.mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Setting up env"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
       "Env setup complete"
@@ -63,9 +63,7 @@ describe("Env tasks", () => {
       expect(err).toEqual("Env setup failure");
       expect(copyFileMock.mock.calls).toHaveLength(1);
       expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-        "Setting up env"
-      );
+      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
       expect(mocked(Console.Success).mock.calls).toHaveLength(0);
       expect(appendFileMock.mock.calls).toHaveLength(1);
     }

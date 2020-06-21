@@ -1,58 +1,55 @@
+jest.mock("fs-extra");
+jest.mock("ajv");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
-jest.mock("fs-extra");
 
 import { Console } from "./../../util/console.util";
 import { mocked } from "ts-jest/utils";
-import { logError } from "../../util/logging.util";
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { generatePackage } from "./package.file.task";
-import { readFile, writeFile } from "fs-extra";
-import * as fs from "fs";
+import { logError } from "../../util/logging.util";
+import { pathExists, readJSON } from "fs-extra";
+import { checkNginxConfig } from "./check.nginx.config.task";
 
 assignConsoleMocks();
 
-const consoleStart = "Generating bare package.json";
+const consoleStart = "Checking Nginx config";
 
-describe("Package file task", () => {
+describe("Check Nginx config task", () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  it("should throw an error if the task failed", async () => {
-    mocked(readFile).mockRejectedValueOnce(
-      new Error("Read file error") as never
-    );
+  it("should throw an error if the path doen't exist", async () => {
+    mocked(pathExists).mockImplementationOnce(() => false);
 
     try {
-      await generatePackage();
+      await checkNginxConfig();
     } catch (err) {
-      expect(err).toBe("package.json generation failed");
+      expect(err).toBe("Missing Nginx config (nginx.config)");
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(new Error("Read file error"));
+    expect(mocked(logError)).toHaveBeenCalledWith(
+      "nginx.config file is Missing"
+    );
   });
 
   it("should complete gracefully if task succeeds", async () => {
-    mocked(readFile).mockReturnValueOnce(
-      Promise.resolve(fs.readFileSync("./package.json"))
-    );
+    mocked(pathExists).mockImplementationOnce(() => true);
 
-    expect(await generatePackage()).resolves;
+    await checkNginxConfig();
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "package.json generated"
+      "Nginx config checked"
     );
 
-    expect(mocked(readFile)).toHaveBeenCalled();
-    expect(mocked(writeFile)).toHaveBeenCalled();
+    expect(mocked(logError)).toHaveBeenCalledTimes(0);
   });
 });

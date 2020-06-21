@@ -11,6 +11,9 @@ import { pathExists, readJSON } from "fs-extra";
 
 assignConsoleMocks();
 
+const consoleStart = "Checking package.json";
+const consoleSuccess = "package.json content extracted";
+
 describe("Load package task", () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -20,15 +23,13 @@ describe("Load package task", () => {
     mocked(pathExists).mockImplementationOnce(() => false);
 
     try {
-      await loadPackageFile();
+      await loadPackageFile(false);
     } catch (err) {
       expect(err).toBe("The package.json file could not be located");
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Checking package.json"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalledWith(
@@ -36,7 +37,7 @@ describe("Load package task", () => {
     );
   });
 
-  it("should throw an error if package.json is missing properties", async () => {
+  it("should throw an error if package.json is missing properties and we're deploying a node app", async () => {
     mocked(pathExists).mockImplementationOnce(() => true);
     mocked(readJSON).mockImplementationOnce(() => {
       return {
@@ -46,7 +47,7 @@ describe("Load package task", () => {
     });
 
     try {
-      await loadPackageFile();
+      await loadPackageFile(false);
     } catch (err) {
       expect(err).toBe(
         "the package.json file has missing properties: name, version and main must be defined."
@@ -54,9 +55,7 @@ describe("Load package task", () => {
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Checking package.json"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalledWith(
@@ -64,7 +63,32 @@ describe("Load package task", () => {
     );
   });
 
-  it("should complete gracefully if task succeeds", async () => {
+  it("should throw an error if package.json is missing properties and we're deploying a spa", async () => {
+    mocked(pathExists).mockImplementationOnce(() => true);
+    mocked(readJSON).mockImplementationOnce(() => {
+      return {
+        name: "my spa",
+      };
+    });
+
+    try {
+      await loadPackageFile(true);
+    } catch (err) {
+      expect(err).toBe(
+        "the package.json file has missing properties: name and version must be defined."
+      );
+    }
+
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+    expect(mocked(logError)).toHaveBeenCalledWith(
+      "the package.json file has missing properties: name and version must be defined."
+    );
+  });
+
+  it("should complete gracefully if task succeeds and we're deploying a node app", async () => {
     mocked(pathExists).mockImplementationOnce(() => true);
     mocked(readJSON).mockImplementationOnce(() => {
       return {
@@ -74,16 +98,30 @@ describe("Load package task", () => {
       };
     });
 
-    expect(await loadPackageFile()).resolves;
+    expect(await loadPackageFile(false)).resolves;
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Checking package.json"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "package.json content extracted"
-    );
+    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
+  });
+
+  it("should complete gracefully if task succeeds and we're deploying a spa", async () => {
+    mocked(pathExists).mockImplementationOnce(() => true);
+    mocked(readJSON).mockImplementationOnce(() => {
+      return {
+        name: "my great package",
+        version: "1.0.0",
+      };
+    });
+
+    expect(await loadPackageFile(true)).resolves;
+
+    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+
+    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
+    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
   });
 });
