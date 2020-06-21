@@ -18,6 +18,9 @@ import {
 
 assignConsoleMocks();
 
+const consoleStart = "Sending the archive to deploy server";
+const exceptionMessage = "Unable to send the archive";
+
 describe("Send archive task", () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -27,15 +30,13 @@ describe("Send archive task", () => {
     mockSSHConnect(true);
 
     try {
-      await sendFileToDeployServer(config, "source.zip", "/var/dest");
+      await sendFileToDeployServer(config, "source.zip");
     } catch (err) {
-      expect(err).toBe("Unable to send the archive");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Sending the archive to deploy server"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -49,15 +50,13 @@ describe("Send archive task", () => {
     mockSSHConnect(false, true);
 
     try {
-      await sendFileToDeployServer(config, "source.zip", "/var/dest");
+      await sendFileToDeployServer(config, "source.zip");
     } catch (err) {
-      expect(err).toBe("Unable to send the archive");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Sending the archive to deploy server"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -71,15 +70,13 @@ describe("Send archive task", () => {
     mockSSHConnect(false, false, true);
 
     try {
-      await sendFileToDeployServer(config, "source.zip", "/var/dest");
+      await sendFileToDeployServer(config, "source.zip");
     } catch (err) {
-      expect(err).toBe("Unable to send the archive");
+      expect(err).toBe(exceptionMessage);
     }
 
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Sending the archive to deploy server"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(0);
     expect(mocked(logError)).toHaveBeenCalled();
@@ -92,14 +89,11 @@ describe("Send archive task", () => {
   it("should complete gracefully if task succeeds", async () => {
     mockSSHConnect(false, false, false);
 
-    expect(await sendFileToDeployServer(config, "source.zip", "/var/dest"))
-      .resolves;
+    expect(await sendFileToDeployServer(config, "source.zip")).resolves;
 
     expect(mocked(connect).mock.calls).toHaveLength(1);
     expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
-      "Sending the archive to deploy server"
-    );
+    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
 
     expect(mocked(Console.Success).mock.calls).toHaveLength(1);
     expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
