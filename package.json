@@ -1,6 +1,6 @@
 {
   "name": "debian-node-deploy",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Unifying deployment tasks for my production server",
   "main": "index.js",
   "bin": {
@@ -8,6 +8,7 @@
     "deploySinglePageApp": "./cli/deploy.spa.app.js"
   },
   "scripts": {
+    "clearjestcache": "jest --clearCache",
     "test": "jest --watchAll src --coverage",
     "build": "rimraf dist-deploy && tsc --project tsconfig-publish.json && node ./project-utils/scripts/copy.package.json.file.js",
     "start": "npm run build && node ./dist-deploy/index.js",
