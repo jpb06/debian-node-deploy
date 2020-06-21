@@ -1,6 +1,6 @@
 {
   "name": "debian-node-deploy",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Unifying deployment tasks for my production server",
   "main": "index.js",
   "bin": {
