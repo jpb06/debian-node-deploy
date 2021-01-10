@@ -1,5 +1,6 @@
 import fs from "fs-extra";
-import { Console } from "./../util/console.util";
+
+import { Console } from "../util/console.util";
 import { logError } from "../util/logging.util";
 
 export const setEnv = async (

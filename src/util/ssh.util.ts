@@ -1,4 +1,5 @@
 import NodeSSH from "node-ssh";
+
 import { DeployConfig } from "../types/deploy.config";
 
 const ssh = new NodeSSH();
@@ -21,8 +22,8 @@ export const exec = async (
 ) => {
   const result = await connection.execCommand(command, options);
   if (result.code === null) {
-    const code = await connection.execCommand("echo $?");
-    result.code = parseInt(code.stdout, 10);
+    const echoResult = await connection.execCommand("echo $?");
+    result.code = parseInt(echoResult.stdout, 10);
   }
 
   return {
