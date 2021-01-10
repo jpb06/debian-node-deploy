@@ -14,9 +14,9 @@ export const mockDoubleExecCommand = (
     })
     .mockImplementationOnce(() => {
       return {
-        code: stderr.length === 0 ? 0 : 1,
-        stderr,
-        stdout,
+        code: 0,
+        stderr: "",
+        stdout: 1,
       };
     });
 
