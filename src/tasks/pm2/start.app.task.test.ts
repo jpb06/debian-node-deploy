@@ -2,15 +2,14 @@ jest.mock("../../util/ssh.util");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "../../util/console.util";
-import { connect, exec } from "../../util/ssh.util";
-import { mocked } from "ts-jest/utils";
-import { logError } from "../../util/logging.util";
-import { config } from "../../tests/test.config";
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { execAppStart } from "./start.app.task";
-import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
+import { dispose, mockSSHConnect } from "../../tests/mocking/ssh.connect.mock";
 import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
+import { config } from "../../tests/test.config";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { connect, exec } from "../../util/ssh.util";
+import { execAppStart } from "./start.app.task";
 
 assignConsoleMocks();
 
@@ -31,13 +30,13 @@ describe("Start app task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(exec)).toBeCalledTimes(0);
-    expect(mocked(dispose)).toBeCalledTimes(0);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalled();
+    expect(exec).toHaveBeenCalledTimes(0);
+    expect(dispose).toHaveBeenCalledTimes(0);
   });
 
   it("should throw an error if the task failed (exception)", async () => {
@@ -50,13 +49,13 @@ describe("Start app task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(exec)).toBeCalledTimes(1);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalled();
+    expect(exec).toHaveBeenCalledTimes(1);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 
   it("should throw an error if the task failed (invalid error code)", async () => {
@@ -69,13 +68,13 @@ describe("Start app task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith("command error");
-    expect(mocked(exec)).toBeCalledTimes(1);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith("command error");
+    expect(exec).toHaveBeenCalledTimes(1);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 
   it("should complete gracefully if task succeeds", async () => {
@@ -84,14 +83,14 @@ describe("Start app task", () => {
 
     expect(await execAppStart(config, "yolo")).resolves;
 
-    expect(mocked(connect).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual("App launched");
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith("App launched");
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(1);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(exec).toHaveBeenCalledTimes(1);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 });

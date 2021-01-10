@@ -2,15 +2,14 @@ jest.mock("../../util/ssh.util");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "./../../util/console.util";
-import { connect, exec } from "../../util/ssh.util";
-import { mocked } from "ts-jest/utils";
-import { logError } from "../../util/logging.util";
-import { config } from "../../tests/test.config";
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { unzipOnRemote } from "./remote.unzip.task";
-import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
+import { dispose, mockSSHConnect } from "../../tests/mocking/ssh.connect.mock";
 import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
+import { config } from "../../tests/test.config";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { connect, exec } from "../../util/ssh.util";
+import { unzipOnRemote } from "./remote.unzip.task";
 
 assignConsoleMocks();
 
@@ -32,16 +31,13 @@ describe("Remote unzip task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(
-      1,
-      new Error("Connection failed")
-    );
-    expect(mocked(dispose)).toBeCalledTimes(0);
-    expect(mocked(exec)).toHaveBeenCalledTimes(0);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(1, new Error("Connection failed"));
+    expect(dispose).toHaveBeenCalledTimes(0);
+    expect(exec).toHaveBeenCalledTimes(0);
   });
 
   it("should throw an error if the mkdir command failed", async () => {
@@ -54,14 +50,14 @@ describe("Remote unzip task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(1, "command 1 error");
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(1, "command 1 error");
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(1);
+    expect(exec).toHaveBeenCalledTimes(1);
   });
 
   it("should throw an error if the cleanup command failed", async () => {
@@ -74,14 +70,14 @@ describe("Remote unzip task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(1, "command 1 error");
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(1, "command 1 error");
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(1);
+    expect(exec).toHaveBeenCalledTimes(1);
   });
 
   it("should throw an error if the cleanup command failed and we're deploying a spa", async () => {
@@ -95,14 +91,14 @@ describe("Remote unzip task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(1, "command 2 error");
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(1, "command 2 error");
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(2);
+    expect(exec).toHaveBeenCalledTimes(2);
   });
 
   it("should throw an error if the unzip command failed", async () => {
@@ -116,14 +112,14 @@ describe("Remote unzip task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(1, "command 2 error");
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(1, "command 2 error");
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(2);
+    expect(exec).toHaveBeenCalledTimes(2);
   });
 
   it("should throw an error if the chown command failed", async () => {
@@ -138,14 +134,14 @@ describe("Remote unzip task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(1, "command 3 error");
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(1, "command 3 error");
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(3);
+    expect(exec).toHaveBeenCalledTimes(3);
   });
 
   it("should complete gracefully if unzipping node app succeeds", async () => {
@@ -156,17 +152,17 @@ describe("Remote unzip task", () => {
 
     expect(await unzipOnRemote(config, "yolo.zip", false)).resolves;
 
-    expect(mocked(connect).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(consoleSuccess);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(3);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(exec).toHaveBeenCalledTimes(3);
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(logError)).toBeCalledTimes(0);
+    expect(logError).toHaveBeenCalledTimes(0);
   });
 
   it("should complete gracefully if unzipping spa succeeds", async () => {
@@ -178,16 +174,16 @@ describe("Remote unzip task", () => {
 
     expect(await unzipOnRemote(config, "yolo.zip", true)).resolves;
 
-    expect(mocked(connect).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(consoleSuccess);
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(4);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(exec).toHaveBeenCalledTimes(4);
+    expect(dispose).toHaveBeenCalledTimes(1);
 
-    expect(mocked(logError)).toBeCalledTimes(0);
+    expect(logError).toHaveBeenCalledTimes(0);
   });
 });

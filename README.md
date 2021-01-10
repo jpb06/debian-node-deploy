@@ -1,5 +1,7 @@
 # debian-node-deploy
 
+![Statements](./badges/badge-statements.svg) ![Branches](./badges/badge-branches.svg) ![Functions](./badges/badge-functions.svg) ![Lines](./badges/badge-lines.svg)
+
 ![Deploying via vscode terminal](./project-utils/readme/deploy2.png)
 
 Here is a little module I made to simplify my deployments needs.

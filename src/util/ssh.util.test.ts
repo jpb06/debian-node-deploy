@@ -13,11 +13,8 @@ jest.mock("node-ssh", () =>
   }))
 );
 
+import { mockDoubleExecCommand, mockExecCommand } from "../tests/mocking/ssh.exec.command.mock";
 import { connect, exec } from "./ssh.util";
-import {
-  mockExecCommand,
-  mockDoubleExecCommand,
-} from "../tests/mocking/ssh.exec.command.mock";
 
 const config = {
   appName: "test",
@@ -43,8 +40,8 @@ describe("SSH utils", () => {
 
     await connect(config);
 
-    expect(connectMock.mock.calls).toHaveLength(1);
-    expect(connectMock.mock.calls[0][0]).toEqual({
+    expect(connectMock).toHaveBeenCalledTimes(1);
+    expect(connectMock).toHaveBeenCalledWith({
       host: config.host,
       port: config.port,
       username: config.user,
@@ -53,16 +50,28 @@ describe("SSH utils", () => {
   });
 
   it("should get the result code when the initial command doesn't give one", async () => {
-    execCommand = mockDoubleExecCommand();
+    execCommand = mockDoubleExecCommand("result", "error");
 
     const connection = await connect(config);
-    await exec(connection, "yolo");
+    const result = await exec(connection, "yolo");
+
+    expect(result).toStrictEqual({
+      code: 1,
+      err: "error",
+      out: "result",
+    });
   });
 
   it("should return the initial command result code if it has one", async () => {
     execCommand = mockExecCommand(0, "Success");
 
     const connection = await connect(config);
-    await exec(connection, "yolo");
+    const result = await exec(connection, "yolo");
+
+    expect(result).toStrictEqual({
+      code: 0,
+      err: "",
+      out: "Success",
+    });
   });
 });

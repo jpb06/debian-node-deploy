@@ -2,16 +2,15 @@ jest.mock("../../util/ssh.util");
 jest.mock("../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "./../../util/console.util";
-import { execCommands } from "./execute.step.commands.task";
-import { DeployStep } from "../../types/deploy.step";
-import { connect, exec } from "../../util/ssh.util";
-import { mocked } from "ts-jest/utils";
-import { logError } from "../../util/logging.util";
-import { config } from "../../tests/test.config";
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { mockSSHConnect, dispose } from "../../tests/mocking/ssh.connect.mock";
+import { dispose, mockSSHConnect } from "../../tests/mocking/ssh.connect.mock";
 import { mockSSHExec } from "../../tests/mocking/ssh.exec.mock";
+import { config } from "../../tests/test.config";
+import { DeployStep } from "../../types/deploy.step";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { connect, exec } from "../../util/ssh.util";
+import { execCommands } from "./execute.step.commands.task";
 
 assignConsoleMocks();
 
@@ -25,10 +24,11 @@ describe("Execute step commands tasks", () => {
 
     expect(execCommands(config, DeployStep.PreStart)).resolves;
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(0);
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(connect).mock.calls).toHaveLength(0);
-    expect(mocked(dispose)).toBeCalledTimes(0);
+    expect(Console.StartTask).toHaveBeenCalledTimes(0);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+
+    expect(connect).toHaveBeenCalledTimes(0);
+    expect(dispose).toHaveBeenCalledTimes(0);
   });
 
   it("should fail if connection failed", async () => {
@@ -43,14 +43,14 @@ describe("Execute step commands tasks", () => {
       expect(err).toBe("Pre stop commands execution failure");
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(
       "Executing pre stop commands"
     );
+    expect(Console.Success).toHaveBeenCalledTimes(0);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(dispose)).toBeCalledTimes(0);
+    expect(logError).toHaveBeenCalled();
+    expect(dispose).toHaveBeenCalledTimes(0);
   });
 
   it("should fail if one command failed", async () => {
@@ -66,14 +66,14 @@ describe("Execute step commands tasks", () => {
       expect(err).toBe("Pre stop commands execution failure");
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(
       "Executing pre stop commands"
     );
+    expect(Console.Success).toHaveBeenCalledTimes(0);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(logError).toHaveBeenCalled();
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 
   it("should succeed if all commands pass", async () => {
@@ -88,18 +88,18 @@ describe("Execute step commands tasks", () => {
       )
     ).resolves;
 
-    expect(mocked(connect).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(
       "Executing post start commands"
     );
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(
       "Post start commands execution success"
     );
 
-    expect(mocked(exec)).toHaveBeenCalledTimes(2);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(exec).toHaveBeenCalledTimes(2);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 });

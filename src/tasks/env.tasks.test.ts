@@ -1,71 +1,58 @@
+import { copyFile } from "fs-extra";
+import { mocked } from "ts-jest/utils";
+
+import { assignConsoleMocks } from "../tests/mocking/console.mock";
+import { Console } from "../util/console.util";
+import { setEnv } from "./env.tasks";
+
 jest.mock("fs-extra");
 jest.mock("./../util/console.util");
 
-import { copyFile, appendFile } from "fs-extra";
-import { Console } from "./../util/console.util";
-import { mocked } from "ts-jest/utils";
-import { setEnv } from "./env.tasks";
-import { assignConsoleMocks } from "../tests/mocking/console.mock";
-
 const copyFileMock = mocked(copyFile);
-const appendFileMock = mocked(appendFile);
 assignConsoleMocks();
 
 const consoleStart = "Setting up env";
 
 describe("Env tasks", () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("shouldn't do anything if passed undefined", async () => {
-    await setEnv(undefined);
+    await setEnv((undefined as unknown) as string);
 
-    expect(copyFileMock.mock.calls).toHaveLength(0);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(0);
+    expect(copyFileMock).toHaveBeenCalledTimes(0);
+    expect(Console.StartTask).toHaveBeenCalledTimes(0);
   });
 
   it("should't do anything if passed a file that isn't an env file", async () => {
     await setEnv("yolo.jpeg");
 
-    expect(copyFileMock.mock.calls).toHaveLength(0);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(0);
+    expect(copyFileMock).toHaveBeenCalledTimes(0);
+    expect(Console.StartTask).toHaveBeenCalledTimes(0);
   });
 
   it("should initialize env", async () => {
-    await setEnv("dev.env");
+    await setEnv("dev.env", `.env`);
 
-    expect(copyFileMock.mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "Env setup complete"
-    );
-  });
-});
-
-describe("Env tasks", () => {
-  beforeAll(() => {
-    copyFileMock.mockImplementation(() =>
-      Promise.reject(new Error("File not found"))
-    );
-  });
-
-  afterAll(() => {
-    copyFileMock.mockReset();
+    expect(copyFileMock).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith("Env setup complete");
   });
 
   it("should throw a string if file is not found", async () => {
+    copyFileMock.mockRejectedValueOnce(new Error("File not found") as never);
+
     try {
-      await setEnv("notfound.env");
+      await setEnv("./dist", ".env.notFound");
     } catch (err) {
       expect(err).toEqual("Env setup failure");
-      expect(copyFileMock.mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
-      expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-      expect(appendFileMock.mock.calls).toHaveLength(1);
+      expect(copyFileMock).toHaveBeenCalledTimes(1);
+      expect(Console.StartTask).toHaveBeenCalledTimes(1);
+      expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
+      expect(Console.Success).toHaveBeenCalledTimes(0);
     }
   });
 });

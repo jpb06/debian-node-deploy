@@ -2,19 +2,15 @@ jest.mock("../../util/ssh.util");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "./../../util/console.util";
-import { connect } from "../../util/ssh.util";
 import { mocked } from "ts-jest/utils";
-import { logError } from "../../util/logging.util";
-import { config } from "../../tests/test.config";
+
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { dispose, mkdir, mockSSHConnect, putFile } from "../../tests/mocking/ssh.connect.mock";
+import { config } from "../../tests/test.config";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { connect } from "../../util/ssh.util";
 import { sendFileToDeployServer } from "./send.archive.task";
-import {
-  mockSSHConnect,
-  mkdir,
-  putFile,
-  dispose,
-} from "../../tests/mocking/ssh.connect.mock";
 
 assignConsoleMocks();
 
@@ -35,15 +31,15 @@ describe("Send archive task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalled();
 
-    expect(mocked(mkdir)).toBeCalledTimes(0);
-    expect(mocked(putFile)).toBeCalledTimes(0);
-    expect(mocked(dispose)).toBeCalledTimes(0);
+    expect(mkdir).toHaveBeenCalledTimes(0);
+    expect(putFile).toHaveBeenCalledTimes(0);
+    expect(dispose).toHaveBeenCalledTimes(0);
   });
 
   it("should throw if mkdir failed", async () => {
@@ -55,15 +51,15 @@ describe("Send archive task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalled();
 
-    expect(mocked(mkdir)).toHaveBeenCalled();
-    expect(mocked(putFile)).toBeCalledTimes(0);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(mkdir).toHaveBeenCalled();
+    expect(putFile).toHaveBeenCalledTimes(0);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 
   it("should throw if putFile failed", async () => {
@@ -75,15 +71,15 @@ describe("Send archive task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalled();
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalled();
 
-    expect(mocked(mkdir)).toBeCalledTimes(1);
-    expect(mocked(putFile)).toBeCalledTimes(1);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(mkdir).toHaveBeenCalledTimes(1);
+    expect(putFile).toHaveBeenCalledTimes(1);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 
   it("should complete gracefully if task succeeds", async () => {
@@ -91,19 +87,19 @@ describe("Send archive task", () => {
 
     expect(await sendFileToDeployServer(config, "source.zip")).resolves;
 
-    expect(mocked(connect).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(
       "Archive uploaded to deploy server"
     );
 
-    expect(mocked(logError)).toBeCalledTimes(0);
+    expect(logError).toHaveBeenCalledTimes(0);
 
-    expect(mocked(mkdir)).toBeCalledTimes(1);
-    expect(mocked(putFile)).toBeCalledTimes(1);
-    expect(mocked(dispose)).toBeCalledTimes(1);
+    expect(mkdir).toHaveBeenCalledTimes(1);
+    expect(putFile).toHaveBeenCalledTimes(1);
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 });

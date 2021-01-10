@@ -3,13 +3,14 @@ jest.mock("ajv");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "./../../util/console.util";
-import { mocked } from "ts-jest/utils";
-import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { logError } from "../../util/logging.util";
-import { pathExists, readJSON } from "fs-extra";
-import { loadDeployConfig } from "./load.deploy.config.task";
 import Ajv from "ajv";
+import { pathExists, readJSON } from "fs-extra";
+import { mocked } from "ts-jest/utils";
+
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { loadDeployConfig } from "./load.deploy.config.task";
 
 assignConsoleMocks();
 
@@ -31,11 +32,11 @@ describe("Load deploy config task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(exceptionMessage);
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith(exceptionMessage);
   });
 
   it("should throw an error if config is invalid", async () => {
@@ -64,19 +65,19 @@ describe("Load deploy config task", () => {
       expect(err).toBe(exceptionMessage);
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenNthCalledWith(
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenNthCalledWith(
       1,
       "Deploy configuration could not be validated:"
     );
-    expect(mocked(logError)).toHaveBeenNthCalledWith(
+    expect(logError).toHaveBeenNthCalledWith(
       2,
       'Errors:[{"keyword":"yo","dataPath":"hm","schemaPath":"arg","params":{"keyword":"yolo"}}]'
     );
-    expect(mocked(logError)).toHaveBeenNthCalledWith(3, exceptionMessage);
+    expect(logError).toHaveBeenNthCalledWith(3, exceptionMessage);
   });
 
   it("should complete gracefully if task succeeds", async () => {
@@ -115,12 +116,12 @@ describe("Load deploy config task", () => {
       appName: "yolo",
     });
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(consoleSuccess);
 
-    expect(mocked(logError)).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledTimes(0);
   });
 });
