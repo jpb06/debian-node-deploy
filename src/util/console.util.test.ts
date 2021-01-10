@@ -1,7 +1,7 @@
-import { Console } from "./console.util";
 import chalk from "chalk";
 import ora from "ora";
-import { mocked } from "ts-jest/utils";
+
+import { Console } from "./console.util";
 
 const succeedMock = jest.fn();
 const warnMock = jest.fn();
@@ -24,10 +24,7 @@ jest.mock("ora", () => {
 
 describe("Console utils", () => {
   afterEach(() => {
-    jest.restoreAllMocks();
-    succeedMock.mockReset();
-    warnMock.mockReset();
-    failMock.mockReset();
+    jest.clearAllMocks();
   });
 
   it("should have default colors", () => {
@@ -39,17 +36,23 @@ describe("Console utils", () => {
 
     Console.Initialize();
     Console.NewSection(text);
-    expect(console.info).toBeCalled();
+    expect(console.info).toHaveBeenCalled();
     expect(console.info).toHaveBeenCalledTimes(3);
-    expect(spy.mock.calls).toEqual([
-      [chalk.bgKeyword(defaultBarColor)(" ")],
-      [
-        chalk.bgKeyword(defaultBarColor)(" ") +
-          " " +
-          chalk.keyword(defaultTaskColor).bold(text),
-      ],
-      [chalk.bgKeyword(defaultBarColor)(" ")],
-    ]);
+
+    expect(spy).toHaveBeenNthCalledWith(
+      1,
+      chalk.bgKeyword(defaultBarColor)(" ")
+    );
+    expect(spy).toHaveBeenNthCalledWith(
+      2,
+      chalk.bgKeyword(defaultBarColor)(" ") +
+        " " +
+        chalk.keyword(defaultTaskColor).bold(text)
+    );
+    expect(spy).toHaveBeenNthCalledWith(
+      3,
+      chalk.bgKeyword(defaultBarColor)(" ")
+    );
   });
 
   it("should have default colors even without calling initialize", () => {
@@ -60,17 +63,15 @@ describe("Console utils", () => {
     const text = "Testing new section";
 
     Console.NewSection(text);
-    expect(console.info).toBeCalled();
+    expect(console.info).toHaveBeenCalled();
     expect(console.info).toHaveBeenCalledTimes(3);
-    expect(spy.mock.calls).toEqual([
-      [chalk.bgKeyword(barColor)(" ")],
-      [
-        chalk.bgKeyword(barColor)(" ") +
-          " " +
-          chalk.keyword(taskColor).bold(text),
-      ],
-      [chalk.bgKeyword(barColor)(" ")],
-    ]);
+
+    expect(spy).toHaveBeenNthCalledWith(1, chalk.bgKeyword(barColor)(" "));
+    expect(spy).toHaveBeenNthCalledWith(
+      2,
+      chalk.bgKeyword(barColor)(" ") + " " + chalk.keyword(taskColor).bold(text)
+    );
+    expect(spy).toHaveBeenNthCalledWith(3, chalk.bgKeyword(barColor)(" "));
   });
 
   it("should initialize colors properly", () => {
@@ -82,17 +83,15 @@ describe("Console utils", () => {
 
     Console.Initialize(barColor, taskColor);
     Console.NewSection(text);
-    expect(console.info).toBeCalled();
+    expect(console.info).toHaveBeenCalled();
     expect(console.info).toHaveBeenCalledTimes(3);
-    expect(spy.mock.calls).toEqual([
-      [chalk.bgKeyword(barColor)(" ")],
-      [
-        chalk.bgKeyword(barColor)(" ") +
-          " " +
-          chalk.keyword(taskColor).bold(text),
-      ],
-      [chalk.bgKeyword(barColor)(" ")],
-    ]);
+
+    expect(spy).toHaveBeenNthCalledWith(1, chalk.bgKeyword(barColor)(" "));
+    expect(spy).toHaveBeenNthCalledWith(
+      2,
+      chalk.bgKeyword(barColor)(" ") + " " + chalk.keyword(taskColor).bold(text)
+    );
+    expect(spy).toHaveBeenNthCalledWith(3, chalk.bgKeyword(barColor)(" "));
   });
 
   it("should report on a task status", () => {
@@ -101,12 +100,12 @@ describe("Console utils", () => {
 
     Console.Initialize();
     Console.StartTask(taskName);
+    Console.Info("");
 
     expect(startMock).toHaveBeenCalledTimes(1);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls[0]).toHaveLength(1);
-    expect(oraMock.calls[0][0]).toEqual({
+    expect(ora).toHaveBeenCalledTimes(1);
+    expect(ora).toHaveBeenCalledWith({
       prefixText: chalk.bgKeyword(taskColor)(" "),
       spinner: "simpleDots",
       text: chalk.keyword("cyan").bold(taskName),
@@ -120,11 +119,11 @@ describe("Console utils", () => {
     Console.StartTask(taskName);
     Console.StartTask(taskName);
     Console.StartTask(taskName);
+    Console.Info("");
 
     expect(startMock).toHaveBeenCalledTimes(1);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls[0]).toHaveLength(1);
+    expect(ora).toHaveBeenCalledTimes(1);
   });
 
   it("should display the task as succeeded", () => {
@@ -138,8 +137,7 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(0);
     expect(failMock).toHaveBeenCalledTimes(0);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls[0]).toHaveLength(1);
+    expect(ora).toHaveBeenCalledTimes(1);
   });
 
   it("should display the task as failed", () => {
@@ -157,19 +155,17 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(0);
     expect(failMock).toHaveBeenCalledTimes(1);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls[0]).toHaveLength(1);
+    expect(ora).toHaveBeenCalledTimes(1);
 
     expect(console.info).toHaveBeenCalledTimes(3);
-    expect(spy.mock.calls).toEqual([
-      [chalk.bgKeyword(barColor)(" ")],
-      [
-        chalk.bgKeyword(barColor)(" ") +
-          " " +
-          chalk.keyword(taskColor).bold("Deploy failed."),
-      ],
-      [chalk.bgKeyword(barColor)(" ")],
-    ]);
+    expect(spy).toHaveBeenNthCalledWith(1, chalk.bgKeyword(barColor)(" "));
+    expect(spy).toHaveBeenNthCalledWith(
+      2,
+      chalk.bgKeyword(barColor)(" ") +
+        " " +
+        chalk.keyword(taskColor).bold("Deploy failed.")
+    );
+    expect(spy).toHaveBeenNthCalledWith(3, chalk.bgKeyword(barColor)(" "));
   });
 
   it("should display the task as warning", () => {
@@ -183,8 +179,7 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(1);
     expect(failMock).toHaveBeenCalledTimes(0);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls[0]).toHaveLength(1);
+    expect(ora).toHaveBeenCalledTimes(1);
   });
 
   it("should terminate gracefully", () => {
@@ -204,20 +199,18 @@ describe("Console utils", () => {
 
     Console.End(true);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls[0]).toHaveLength(1);
+    expect(ora).toHaveBeenCalledTimes(1);
 
-    expect(console.info).toBeCalled();
+    expect(console.info).toHaveBeenCalled();
     expect(console.info).toHaveBeenCalledTimes(3);
-    expect(spy.mock.calls).toEqual([
-      [chalk.bgKeyword(barColor)(" ")],
-      [
-        chalk.bgKeyword(barColor)(" ") +
-          " " +
-          chalk.keyword(taskColor).bold("Deploy complete!"),
-      ],
-      [chalk.bgKeyword(barColor)(" ")],
-    ]);
+    expect(spy).toHaveBeenNthCalledWith(1, chalk.bgKeyword(barColor)(" "));
+    expect(spy).toHaveBeenNthCalledWith(
+      2,
+      chalk.bgKeyword(barColor)(" ") +
+        " " +
+        chalk.keyword(taskColor).bold("Deploy complete!")
+    );
+    expect(spy).toHaveBeenNthCalledWith(3, chalk.bgKeyword(barColor)(" "));
   });
 });
 
@@ -236,7 +229,6 @@ describe("Console utils", () => {
     expect(warnMock).toHaveBeenCalledTimes(0);
     expect(failMock).toHaveBeenCalledTimes(0);
 
-    const oraMock = mocked(ora).mock;
-    expect(oraMock.calls).toHaveLength(0);
+    expect(ora).toHaveBeenCalledTimes(0);
   });
 });

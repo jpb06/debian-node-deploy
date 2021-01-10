@@ -1,12 +1,13 @@
-import events from "events";
 import archiver from "archiver";
+import events from "events";
+import { createWriteStream, ensureDir } from "fs-extra";
+import { PassThrough } from "stream";
 import { mocked } from "ts-jest/utils";
-import { ensureDir, createWriteStream } from "fs-extra";
-import { Console } from "./../util/console.util";
+
+import { assignConsoleMocks } from "../tests/mocking/console.mock";
+import { Console } from "../util/console.util";
 import { logError } from "../util/logging.util";
 import { zip } from "./zipping.task";
-import { PassThrough } from "stream";
-import { assignConsoleMocks } from "../tests/mocking/console.mock";
 
 jest.mock("fs-extra");
 jest.mock("./../util/console.util");
@@ -26,6 +27,7 @@ class Archiver extends events.EventEmitter {
 const ensureDirMock = mocked(ensureDir);
 const createWriteStreamMock = mocked(createWriteStream);
 const mockedArchiver = mocked(archiver);
+const logErrorMock = mocked(logError);
 assignConsoleMocks();
 
 const consoleStart = "Zipping codebase";
@@ -40,7 +42,7 @@ describe("Zipping tasks", () => {
 
   it("Should zip", async () => {
     const mockWriteable = new PassThrough();
-    mocked(createWriteStream).mockReturnValue(mockWriteable as any);
+    createWriteStreamMock.mockReturnValue(mockWriteable as any);
     setTimeout(() => {
       mockWriteable.emit("close");
     }, 100);
@@ -57,27 +59,27 @@ describe("Zipping tasks", () => {
 
     await zip("./dist", "./release/test.zip");
 
-    expect(mockedArchiver.mock.calls).toHaveLength(1);
+    expect(mockedArchiver).toHaveBeenCalledTimes(1);
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
-    expect(ensureDirMock.mock.calls).toHaveLength(1);
-    expect(createWriteStreamMock.mock.calls).toHaveLength(1);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
+    expect(ensureDirMock).toHaveBeenCalledTimes(1);
+    expect(createWriteStreamMock).toHaveBeenCalledTimes(1);
 
-    expect(archiveMock.directory.mock.calls).toHaveLength(1);
-    expect(archiveMock.pipe.mock.calls).toHaveLength(1);
+    expect(archiveMock.directory).toHaveBeenCalledTimes(1);
+    expect(archiveMock.pipe).toHaveBeenCalledTimes(1);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "Codebase zipping complete"
-    );
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith("Codebase zipping complete");
 
-    expect(archiveMock.finalize.mock.calls).toHaveLength(1);
+    expect(archiveMock.finalize).toHaveBeenCalledTimes(1);
+
+    expect(logErrorMock).toHaveBeenCalledTimes(0);
   });
 
   it("should reject if stream is errored", async () => {
     const mockWriteable = new PassThrough();
-    mocked(createWriteStream).mockReturnValue(mockWriteable as any);
+    createWriteStreamMock.mockReturnValue(mockWriteable as any);
     setTimeout(() => {
       mockWriteable.emit("error");
     }, 100);
@@ -94,28 +96,28 @@ describe("Zipping tasks", () => {
     try {
       await zip("./dist", "./release/test.zip");
     } catch (err) {
-      expect(mockedArchiver.mock.calls).toHaveLength(1);
+      expect(mockedArchiver).toHaveBeenCalledTimes(1);
 
-      expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
-      expect(ensureDirMock.mock.calls).toHaveLength(1);
-      expect(createWriteStreamMock.mock.calls).toHaveLength(1);
+      expect(Console.StartTask).toHaveBeenCalledTimes(1);
+      expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
+      expect(ensureDirMock).toHaveBeenCalledTimes(1);
+      expect(createWriteStreamMock).toHaveBeenCalledTimes(1);
 
-      expect(archiveMock.directory.mock.calls).toHaveLength(1);
-      expect(archiveMock.pipe.mock.calls).toHaveLength(1);
+      expect(archiveMock.directory).toHaveBeenCalledTimes(1);
+      expect(archiveMock.pipe).toHaveBeenCalledTimes(1);
 
-      expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+      expect(Console.Success).toHaveBeenCalledTimes(0);
 
-      expect(archiveMock.finalize.mock.calls).toHaveLength(1);
+      expect(archiveMock.finalize).toHaveBeenCalledTimes(1);
 
-      expect(mocked(logError).mock.calls).toHaveLength(1);
+      expect(logErrorMock).toHaveBeenCalledTimes(1);
       expect(err).toEqual(exceptionMessage);
     }
   });
 
   it("should reject if archive is errored", async () => {
     const mockWriteable = new PassThrough();
-    mocked(createWriteStream).mockReturnValue(mockWriteable as any);
+    createWriteStreamMock.mockReturnValue(mockWriteable as any);
     const archiveMock = new Archiver();
     mocked(archiver).mockImplementationOnce(
       jest.fn().mockImplementationOnce(() => {
@@ -132,21 +134,21 @@ describe("Zipping tasks", () => {
     try {
       await zip("./dist", "./release/test.zip");
     } catch (err) {
-      expect(mockedArchiver.mock.calls).toHaveLength(1);
+      expect(mockedArchiver).toHaveBeenCalledTimes(1);
 
-      expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-      expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
-      expect(ensureDirMock.mock.calls).toHaveLength(1);
-      expect(createWriteStreamMock.mock.calls).toHaveLength(1);
+      expect(Console.StartTask).toHaveBeenCalledTimes(1);
+      expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
+      expect(ensureDirMock).toHaveBeenCalledTimes(1);
+      expect(createWriteStreamMock).toHaveBeenCalledTimes(1);
 
-      expect(archiveMock.directory.mock.calls).toHaveLength(1);
-      expect(archiveMock.pipe.mock.calls).toHaveLength(1);
+      expect(archiveMock.directory).toHaveBeenCalledTimes(1);
+      expect(archiveMock.pipe).toHaveBeenCalledTimes(1);
 
-      expect(mocked(Console.Success).mock.calls).toHaveLength(0);
+      expect(Console.Success).toHaveBeenCalledTimes(0);
 
-      expect(archiveMock.finalize.mock.calls).toHaveLength(1);
+      expect(archiveMock.finalize).toHaveBeenCalledTimes(1);
 
-      expect(mocked(logError).mock.calls).toHaveLength(1);
+      expect(logErrorMock).toHaveBeenCalledTimes(1);
       expect(err).toEqual(exceptionMessage);
     }
   });

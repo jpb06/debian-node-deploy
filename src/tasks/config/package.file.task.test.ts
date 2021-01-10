@@ -2,13 +2,14 @@ jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 jest.mock("fs-extra");
 
-import { Console } from "./../../util/console.util";
-import { mocked } from "ts-jest/utils";
-import { logError } from "../../util/logging.util";
-import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { generatePackage } from "./package.file.task";
-import { readFile, writeFile } from "fs-extra";
 import * as fs from "fs";
+import { readFile, writeFile } from "fs-extra";
+import { mocked } from "ts-jest/utils";
+
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { generatePackage } from "./package.file.task";
 
 assignConsoleMocks();
 
@@ -30,11 +31,11 @@ describe("Package file task", () => {
       expect(err).toBe("package.json generation failed");
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(new Error("Read file error"));
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith(new Error("Read file error"));
   });
 
   it("should complete gracefully if task succeeds", async () => {
@@ -44,15 +45,13 @@ describe("Package file task", () => {
 
     expect(await generatePackage()).resolves;
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "package.json generated"
-    );
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith("package.json generated");
 
-    expect(mocked(readFile)).toHaveBeenCalled();
-    expect(mocked(writeFile)).toHaveBeenCalled();
+    expect(readFile).toHaveBeenCalledTimes(1);
+    expect(writeFile).toHaveBeenCalledTimes(1);
   });
 });

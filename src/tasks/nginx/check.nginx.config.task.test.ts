@@ -3,11 +3,12 @@ jest.mock("ajv");
 jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 
-import { Console } from "./../../util/console.util";
+import { pathExists } from "fs-extra";
 import { mocked } from "ts-jest/utils";
+
 import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { Console } from "../../util/console.util";
 import { logError } from "../../util/logging.util";
-import { pathExists, readJSON } from "fs-extra";
 import { checkNginxConfig } from "./check.nginx.config.task";
 
 assignConsoleMocks();
@@ -28,13 +29,11 @@ describe("Check Nginx config task", () => {
       expect(err).toBe("Missing Nginx config (nginx.config)");
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(
-      "nginx.config file is Missing"
-    );
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith("nginx.config file is Missing");
   });
 
   it("should complete gracefully if task succeeds", async () => {
@@ -42,14 +41,12 @@ describe("Check Nginx config task", () => {
 
     await checkNginxConfig();
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(
-      "Nginx config checked"
-    );
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith("Nginx config checked");
 
-    expect(mocked(logError)).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledTimes(0);
   });
 });

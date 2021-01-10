@@ -2,12 +2,13 @@ jest.mock("./../../util/console.util");
 jest.mock("../../util/logging.util");
 jest.mock("fs-extra");
 
-import { Console } from "./../../util/console.util";
-import { mocked } from "ts-jest/utils";
-import { loadPackageFile } from "./load.package.file.task";
-import { assignConsoleMocks } from "../../tests/mocking/console.mock";
-import { logError } from "../../util/logging.util";
 import { pathExists, readJSON } from "fs-extra";
+import { mocked } from "ts-jest/utils";
+
+import { assignConsoleMocks } from "../../tests/mocking/console.mock";
+import { Console } from "../../util/console.util";
+import { logError } from "../../util/logging.util";
+import { loadPackageFile } from "./load.package.file.task";
 
 assignConsoleMocks();
 
@@ -28,11 +29,11 @@ describe("Load package task", () => {
       expect(err).toBe("The package.json file could not be located");
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith(
       "The package.json file could not be located"
     );
   });
@@ -54,11 +55,11 @@ describe("Load package task", () => {
       );
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith(
       "the package.json file has missing properties: name, version and main must be defined."
     );
   });
@@ -79,11 +80,11 @@ describe("Load package task", () => {
       );
     }
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(0);
-    expect(mocked(logError)).toHaveBeenCalledWith(
+    expect(Console.Success).toHaveBeenCalledTimes(0);
+    expect(logError).toHaveBeenCalledWith(
       "the package.json file has missing properties: name and version must be defined."
     );
   });
@@ -100,11 +101,11 @@ describe("Load package task", () => {
 
     expect(await loadPackageFile(false)).resolves;
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(consoleSuccess);
   });
 
   it("should complete gracefully if task succeeds and we're deploying a spa", async () => {
@@ -118,10 +119,10 @@ describe("Load package task", () => {
 
     expect(await loadPackageFile(true)).resolves;
 
-    expect(mocked(Console.StartTask).mock.calls).toHaveLength(1);
-    expect(mocked(Console.StartTask).mock.calls[0][0]).toEqual(consoleStart);
+    expect(Console.StartTask).toHaveBeenCalledTimes(1);
+    expect(Console.StartTask).toHaveBeenCalledWith(consoleStart);
 
-    expect(mocked(Console.Success).mock.calls).toHaveLength(1);
-    expect(mocked(Console.Success).mock.calls[0][0]).toEqual(consoleSuccess);
+    expect(Console.Success).toHaveBeenCalledTimes(1);
+    expect(Console.Success).toHaveBeenCalledWith(consoleSuccess);
   });
 });
